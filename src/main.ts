@@ -1,5 +1,11 @@
-import { createApp } from 'vue'
-import './style.css'
-import App from './App.vue'
+import { createApp } from 'vue';
+import App from './App.vue';
+import router from '@/router';
 
-createApp(App).mount('#app')
+import { useMessage } from 'naive-ui';
+const app = createApp(App);
+
+app.config.globalProperties.$message = useMessage();
+
+app.use(router);
+app.mount('#app');

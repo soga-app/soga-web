@@ -46,6 +46,8 @@ module.exports = {
         ],
         'space-before-function-paren': 'off',
         quotes: ['error', 'single'],
-        'comma-dangle': ['error', 'never']
+        'comma-dangle': ['error', 'never'],
+        //关闭组件命名规则
+        'vue/multi-word-component-names': 'off'
     }
 };
