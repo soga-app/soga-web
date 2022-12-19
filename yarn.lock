@@ -2815,7 +2815,12 @@
   "resolved" "https://registry.npmmirror.com/pify/-/pify-4.0.1.tgz"
   "version" "4.0.1"
 
-"pinia@^2.0.25":
+"pinia-plugin-persistedstate@^3.0.1":
+  "integrity" "sha512-WRNWtR4v8StJqBQH+Qiz88SGnlr4wvEyh7wtA+fYEVLoIOnpZ0v4FICvUcC8eUkAIvQL3n6/Ew2yryw7okazvA=="
+  "resolved" "https://registry.npmmirror.com/pinia-plugin-persistedstate/-/pinia-plugin-persistedstate-3.0.1.tgz"
+  "version" "3.0.1"
+
+"pinia@^2.0.0", "pinia@^2.0.25":
   "integrity" "sha512-3reAkjJ6bW2D5hZKRMS0c9rUbHVlsVyZd037xO0PJr2AuF/09RRSBnFLlJgmHF4Jx6dEoW/jZBOHTushY7IMlw=="
   "resolved" "https://registry.npmmirror.com/pinia/-/pinia-2.0.25.tgz"
   "version" "2.0.25"

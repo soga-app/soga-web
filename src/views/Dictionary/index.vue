@@ -1,4 +1,4 @@
-<template> 字典首页 </template>
+<template> 字典首页{{ count }} </template>
 <script lang="ts" setup>
     import { ref } from 'vue';
 

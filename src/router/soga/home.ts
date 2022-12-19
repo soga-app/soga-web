@@ -5,9 +5,14 @@ export default [
         component: () => import('@/views/Home/index.vue')
     },
     {
-        path: 'login-regist',
-        name: 'LoginRegister',
-        component: () => import('@/views/Home/LoginRegister.vue')
+        path: 'login',
+        name: 'Login',
+        component: () => import('@/views/Home/Login.vue')
+    },
+    {
+        path: 'signup',
+        name: 'SignUp',
+        component: () => import('@/views/Home/SignUp.vue')
     },
     {
         path: 'userCenter',

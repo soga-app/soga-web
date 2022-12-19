@@ -50,7 +50,7 @@ axios.interceptors.response.use(
     }
 );
 
-async function request(config: AxiosRequestConfig, hasErrTips = false, requireOriginalRes = false) {
+async function request(config: AxiosRequestConfig, hasErrTips = false, requireOriginalRes = true) {
     try {
         const res = await axios(config);
         if (!res) {
