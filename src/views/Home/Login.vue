@@ -48,9 +48,9 @@
           </n-tab-pane>
           <n-tab-pane name="login-by-verification" tab="验证码登录">
             <n-form :rules="rules" :model="model">
-              <n-form-item-row path="fieldPhone">
+              <n-form-item-row path="fieldEmail">
                 <n-input
-                  v-model:value="model.fieldPhone"
+                  v-model:value="model.fieldEmail"
                   placeholder="邮箱"
                   clearable
                   size="large"
@@ -95,6 +95,12 @@
   const globalStore = GlobalStore();
   const formInstRef = ref<FormInst | null>(null);
   const rules = {
+    fieldEmail: {
+      required: true,
+      message: '请正确输入邮箱',
+      pattern: /^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/,
+      trigger: ['input', 'blur']
+    },
     fieldPassword: {
       required: true,
       message: '密码需要输入6到12位，需出现字母和数字两种符号',
@@ -123,7 +129,8 @@
   const model = reactive({
     fieldPassword: '',
     fieldPhone: '',
-    fieldUsername: ''
+    fieldUsername: '',
+    fieldEmail: ''
   });
   const login = (e: MouseEvent) => {
     e.preventDefault();
@@ -133,7 +140,7 @@
         console.log(formInstRef.value);
         Login({ username: model.fieldUsername, password: model.fieldPassword }).then((res) => {
           if (res.data.code === 200) {
-            console.log(res);
+            console.log(res.data.data);
             window.$message.success('登录成功！');
             globalStore.setToken(res.data.data);
             router.push('./index');

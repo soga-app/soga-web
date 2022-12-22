@@ -25,5 +25,26 @@ export default defineConfig({
         rewrite: (path: string) => path.replace(/^\/api/, '')
       }
     }
+  },
+  build: {
+    outDir: 'dist',
+    minify: 'esbuild',
+    // esbuild 打包更快，但是不能去除 console.log，terser打包慢，但能去除 console.log
+    // minify: "terser",
+    // terserOptions: {
+    // 	compress: {
+    // 		drop_console: viteEnv.VITE_DROP_CONSOLE,
+    // 		drop_debugger: true
+    // 	}
+    // },
+    chunkSizeWarningLimit: 1500,
+    rollupOptions: {
+      output: {
+        // Static resource classification and packaging
+        chunkFileNames: 'assets/js/[name]-[hash].js',
+        entryFileNames: 'assets/js/[name]-[hash].js',
+        assetFileNames: 'assets/[ext]/[name]-[hash].[ext]'
+      }
+    }
   }
 });

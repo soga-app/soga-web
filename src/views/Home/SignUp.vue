@@ -13,7 +13,7 @@
               <n-form-item-row path="fieldGender">
                 <n-radio-group v-model:value="model.fieldGender" name="radiogroup">
                   <n-space justify="space-around" class="radio-space">
-                    <!--                    <span>性别</span>-->
+                    <span>性别</span>
                     <n-radio key="0" value="男"> 男 </n-radio>
                     <n-radio key="1" value="女"> 女 </n-radio>
                   </n-space>
@@ -90,12 +90,9 @@
     }
   };
   const signup = (e: MouseEvent) => {
-    console.log(22);
     e.preventDefault();
     formInstRef.value?.validate((errors) => {
       if (!errors) {
-        console.log('验证通过');
-        console.log(formInstRef.value);
         SignUp({
           name: model.fieldUsername,
           password: model.fieldPassword,
@@ -104,10 +101,11 @@
         }).then((res) => {
           if (res.data.code === 200) {
             console.log(res);
-            window.$message.success('注册成功！');
+            console.log(res.data.data);
+            window.$message.success(res.data.msg);
             router.push('./login');
           } else {
-            window.$message.error(res.data.message);
+            window.$message.error(res.data.msg);
           }
         });
       } else {
