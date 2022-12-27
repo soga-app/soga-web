@@ -74,7 +74,7 @@
     fieldPhone: {
       required: true,
       message: '请正确输入手机号',
-      pattern: /^[1][3,4,5,7,8][0-9]{9}$/,
+      pattern: /^[1][3,4,5,7,8,9][0-9]{9}$/,
       trigger: ['input', 'blur']
     },
     fieldUsername: {
@@ -125,7 +125,6 @@
   .signup {
     .img-container {
       background: rgba(88, 122, 203, 0.3);
-      height: 768px;
       .background {
         position: relative;
         top: 94px;
@@ -143,7 +142,8 @@
         }
       }
     }
-    width: 1366px;
+    width: 100%;
+    height: 100vh;
     margin: 0 auto;
     display: flex;
     .img-container {

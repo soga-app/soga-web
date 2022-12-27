@@ -159,7 +159,6 @@
   .login {
     .img-container {
       background: rgba(88, 122, 203, 0.3);
-      height: 768px;
       .background {
         position: relative;
         top: 94px;
@@ -177,7 +176,8 @@
         }
       }
     }
-    width: 1366px;
+    width: 100%;
+    height: 100vh;
     margin: 0 auto;
     display: flex;
     .img-container {

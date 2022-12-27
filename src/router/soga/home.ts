@@ -7,12 +7,14 @@ export default [
   {
     path: 'login',
     name: 'Login',
-    component: () => import('@/views/Home/Login.vue')
+    component: () => import('@/views/Home/Login.vue'),
+    meta: { hideNav: true }
   },
   {
     path: 'signup',
     name: 'SignUp',
-    component: () => import('@/views/Home/SignUp.vue')
+    component: () => import('@/views/Home/SignUp.vue'),
+    meta: { hideNav: true }
   },
   {
     path: 'userCenter',
