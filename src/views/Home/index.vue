@@ -1,3 +1,10 @@
+<script lang="ts" setup>
+  import { readonly } from 'vue';
+  import Calendar from './components/Calendar.vue';
+  import { UtilityMap } from './index';
+  const utilityList = readonly(['translate', 'oraltrain', 'community', 'reciteword']);
+</script>
+
 <template>
   <div class="home-wrapper home">
     <div class="home-content">
@@ -35,15 +42,13 @@
           </div>
         </div>
       </div>
-      <div class="home-right"></div>
+      <div class="home-right">
+        <Calendar />
+      </div>
     </div>
   </div>
 </template>
-<script lang="ts" setup>
-  import { readonly } from 'vue';
-  import { UtilityMap } from './index.ts';
-  const utilityList = readonly(['translate', 'oraltrain', 'community', 'reciteword']);
-</script>
+
 <style scoped lang="less">
   @bgColorSet: {
     translate: #fff4d5;
@@ -109,6 +114,7 @@
         padding: 12px 16px 24px 34px;
         background: rgba(88, 122, 203, 0.3);
         box-shadow: 0px 8px 40px 0px rgba(138, 138, 138, 0.2);
+        border-radius: 4px;
         opacity: 1;
 
         .card-up {
@@ -179,6 +185,7 @@
       }
     }
     &-right {
+      margin-left: 60px;
     }
   }
 </style>
