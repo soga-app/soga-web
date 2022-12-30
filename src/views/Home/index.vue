@@ -43,7 +43,13 @@
         </div>
       </div>
       <div class="home-right">
-        <Calendar />
+        <div class="word-record">
+          <div class="record-num">
+            <div class="record-num-title">打卡天数</div> <div class="record-num-info">15</div>
+          </div>
+          <div class="calendar"><Calendar /> </div>
+          <div class="record-check-button">查看打卡记录</div>
+        </div>
       </div>
     </div>
   </div>
@@ -186,6 +192,59 @@
     }
     &-right {
       margin-left: 60px;
+      .word-record {
+        height: 578px;
+        background: rgba(88, 122, 203, 0.1);
+        box-shadow: 0px 4px 4px 0px rgba(143, 142, 142, 0.25);
+        border-radius: 10px 10px 10px 10px;
+        opacity: 1;
+        padding: 24px 20px;
+        .record-num {
+          margin-top: 16px;
+          color: #6178b0;
+          line-height: 22px;
+          font-weight: bold;
+          margin-bottom: 40px;
+          &-title {
+            font-size: 18px;
+            text-align: center;
+          }
+          &-info {
+            margin-top: 10px;
+            font-size: 17px;
+            text-align: center;
+          }
+        }
+        .record-check-button {
+          margin: 0 auto;
+          margin-top: 40px;
+          display: flex;
+          justify-content: center;
+          width: 244px;
+          height: 36px;
+          line-height: 36px;
+          background: linear-gradient(
+            125deg,
+            rgba(255, 255, 255, 0.4) 0%,
+            rgba(255, 255, 255, 0) 100%
+          );
+          box-shadow: 0px 8px 20px 0px rgba(138, 138, 138, 0.2);
+          border-radius: 6px 6px 6px 6px;
+          opacity: 1;
+          border: 2px solid;
+          border-image: linear-gradient(
+              132deg,
+              rgba(255, 255, 255, 1),
+              rgba(255, 255, 255, 0),
+              rgba(255, 255, 255, 0),
+              rgba(210, 204, 248, 0.4)
+            )
+            2 2;
+          font-weight: bold;
+          color: #6178b0;
+          cursor: pointer;
+        }
+      }
     }
   }
 </style>
