@@ -74,6 +74,13 @@
 
   watch(alterDate, (newVal) => {
     setDays(newVal.year, newVal.month);
+    const curFullDays = getFullDayOfMonth(newVal.year, newVal.month + 1);
+    if (curFullDays < alterDate.day) {
+      alterDate.day = curFullDays;
+    }
+    if (newVal.month === curDate.month) {
+      alterDate.day = curDate.day;
+    }
   });
 
   let yearOption = computed(() => {
@@ -176,6 +183,11 @@
     days[20].isHighlight = true;
     days[33].isHighlight = true;
   }
+
+  function getFullDayOfMonth(year: number, month: number) {
+    const date = new Date(year, month, 0);
+    return date.getDate();
+  }
 </script>
 <style lang="less" scoped>
   .calendar-wrapper {
@@ -275,7 +287,7 @@
           width: 4px;
           height: 4px;
           border-radius: 50%;
-          background-color: #587ace;
+          background-color: #6080d3bb;
         }
       }
 

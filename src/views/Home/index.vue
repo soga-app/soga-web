@@ -19,8 +19,7 @@
               <div class="word">
                 <div class="word-text">がおわる</div>
                 <div class="word-audio">
-                  <div class="word-audio-female"></div>
-                  <div class="word-audio-male"></div>
+                  <svg-icon name="icon-laba" color="#fff" />
                 </div>
               </div>
               <div class="meaning">终了，结束 </div>
@@ -141,10 +140,16 @@
         .card-down {
           margin-left: 52px;
           .word {
+            display: flex;
+            align-items: center;
             margin-bottom: 6px;
             &-text {
               font-size: 15px;
               line-height: 28px;
+            }
+            &-audio {
+              margin-left: 8px;
+              cursor: pointer;
             }
           }
           .meaning {
