@@ -1,9 +1,7 @@
-import http from '@/api/config';
+import user from './user/index';
+import dictionary from './dictionary/index';
 
-export const Login = (params: any) => {
-  return http.post<string>('api/user/loginUsername', params);
-};
-
-export const SignUp = (params: any) => {
-  return http.post('api/user/insert', params);
+export default {
+  user,
+  dictionary
 };

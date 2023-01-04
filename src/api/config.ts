@@ -1,6 +1,5 @@
 import axios, { AxiosRequestConfig, AxiosResponse, AxiosInstance } from 'axios';
 import qs from 'qs';
-import { ResultData } from './interface';
 axios.defaults.timeout = 600000;
 
 const config = {
@@ -60,17 +59,76 @@ class RequestHttp {
       }
     );
   }
-  get<T>(url: string, params?: object, _object = {}): Promise<ResultData<T>> {
-    return this.service.get(url, { params, ..._object });
+
+  /* 用途：
+  1、请求成功，业务状态码200，对返回结果的解构（若不需要解构，用requireOriginalRes控制）
+  2、http请求200， 业务状态码非200，说明逻辑判断这是不成功的，那就全局message提示服务端的报错
+      因为并非所有 http错误状态码都配置有错误信息，所以通过 hasErrTips 控制
+   */
+  async request(config: AxiosRequestConfig, hasErrTips = false, requireOriginalRes = false) {
+    try {
+      const res = await this.service.request(config);
+      if (res.status === 204) {
+        //有缓存
+        return Promise.resolve();
+      }
+      if (requireOriginalRes) {
+        return Promise.resolve(res);
+      }
+      const { code, msg, data } = res.data; //后端定义的统一返回体
+      if (code === 200) {
+        return Promise.resolve(data);
+      } else {
+        window.$message.error(msg);
+        return Promise.reject(res.data);
+      }
+    } catch (e: any) {
+      if (hasErrTips) {
+        const errText = e.msg; //需与后端统一
+        window.$message.error(errText);
+      }
+      return Promise.reject(e);
+    }
   }
-  post<T>(url: string, params?: object, _object = {}): Promise<ResultData<T>> {
-    return this.service.post(url, params, _object);
+
+  get(
+    url: string,
+    params?: any,
+    config: any = {},
+    hasErrTips?: boolean,
+    requireOriginalRes?: boolean
+  ) {
+    return this.request({ method: 'get', url, params, ...config }, hasErrTips, requireOriginalRes);
   }
-  put<T>(url: string, params?: object, _object = {}): Promise<ResultData<T>> {
-    return this.service.put(url, params, _object);
+
+  post(
+    url: string,
+    data?: any,
+    config: any = {},
+    hasErrTips?: boolean,
+    requireOriginalRes?: boolean
+  ) {
+    return this.request({ method: 'post', url, data, ...config }, hasErrTips, requireOriginalRes);
   }
-  delete<T>(url: string, params?: any, _object = {}): Promise<ResultData<T>> {
-    return this.service.delete(url, { params, ..._object });
+
+  del(
+    url: string,
+    data?: any,
+    config: any = {},
+    hasErrTips?: boolean,
+    requireOriginalRes?: boolean
+  ) {
+    return this.request({ method: 'delete', url, data, ...config }, hasErrTips, requireOriginalRes);
+  }
+
+  put(
+    url: string,
+    data?: any,
+    config: any = {},
+    hasErrTips?: boolean,
+    requireOriginalRes?: boolean
+  ) {
+    return this.request({ method: 'get', url, data, ...config }, hasErrTips, requireOriginalRes);
   }
 }
 

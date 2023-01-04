@@ -88,7 +88,7 @@
 <script setup lang="ts">
   import { ref, reactive } from 'vue';
   import { FormInst } from 'naive-ui';
-  import { Login } from '@/api';
+  import api from '@/api';
   import { GlobalStore } from '@/stores';
   import { useRouter } from 'vue-router';
   const router = useRouter();
@@ -134,20 +134,19 @@
   });
   const login = (e: MouseEvent) => {
     e.preventDefault();
-    formInstRef.value?.validate((errors) => {
+    formInstRef.value?.validate(async (errors) => {
       if (!errors) {
         console.log('验证通过');
         console.log(formInstRef.value);
-        Login({ username: model.fieldUsername, password: model.fieldPassword }).then((res) => {
-          if (res.data.code === 200) {
-            console.log(res.data.data);
-            window.$message.success('登录成功！');
-            globalStore.setToken(res.data.data);
-            router.push('./index');
-          } else {
-            window.$message.error('登录失败，请检查账号或密码是否正确');
-          }
-        });
+        try {
+          const res = await api.user.login({
+            username: model.fieldUsername,
+            password: model.fieldPassword
+          });
+          window.$message.success('登录成功！');
+          globalStore.setToken(res);
+          router.push('./index');
+        } catch (error) {}
       } else {
         console.log(errors);
       }

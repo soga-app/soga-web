@@ -61,7 +61,8 @@
   import { reactive, ref } from 'vue';
   import { FormInst } from 'naive-ui';
   import { useRouter } from 'vue-router';
-  import { SignUp } from '@/api';
+  import api from '@/api';
+
   const router = useRouter();
   const formInstRef = ref<FormInst | null>(null);
   const rules = {
@@ -91,23 +92,18 @@
   };
   const signup = (e: MouseEvent) => {
     e.preventDefault();
-    formInstRef.value?.validate((errors) => {
+    formInstRef.value?.validate(async (errors) => {
       if (!errors) {
-        SignUp({
-          name: model.fieldUsername,
-          password: model.fieldPassword,
-          gender: model.fieldGender,
-          phone: model.fieldPhone
-        }).then((res) => {
-          if (res.data.code === 200) {
-            console.log(res);
-            console.log(res.data.data);
-            window.$message.success(res.data.msg);
-            router.push('./login');
-          } else {
-            window.$message.error(res.data.msg);
-          }
-        });
+        try {
+          await api.user.signUp({
+            name: model.fieldUsername,
+            password: model.fieldPassword,
+            gender: model.fieldGender,
+            phone: model.fieldPhone
+          });
+          window.$message.success('注册成功');
+          router.push('./login');
+        } catch (error) {}
       } else {
         console.log(errors);
       }
@@ -117,7 +113,7 @@
     fieldPassword: '',
     fieldPhone: '',
     fieldUsername: '',
-    fieldGender: null
+    fieldGender: ''
   });
 </script>
 
