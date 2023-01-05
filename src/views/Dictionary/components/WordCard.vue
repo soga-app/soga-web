@@ -9,9 +9,7 @@
   </div>
 </template>
 
-<script lang="ts" setup>
-  let word = defineProps(['word']);
-</script>
+<script lang="ts" setup></script>
 
 <style lang="less" scoped>
   div[class^='word-layer'] {

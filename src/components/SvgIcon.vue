@@ -7,7 +7,10 @@
 <script lang="ts" setup>
   import { toRef } from 'vue';
   const props = defineProps({
-    name: String,
+    name: {
+      type: String,
+      default: ''
+    },
     fontSize: {
       type: String,
       default: '16px'

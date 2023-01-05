@@ -1,5 +1,5 @@
-import user from './user/index';
-import dictionary from './dictionary/index';
+import user from '@/api/user/index';
+import dictionary from '@/api/dictionary/index';
 
 export default {
   user,
