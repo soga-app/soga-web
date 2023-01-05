@@ -12,7 +12,7 @@
       </n-space>
     </div>
   </div>
-  <router-view></router-view>
+  <div class="content-wrapper"><router-view></router-view> </div>
 </template>
 <script lang="ts" setup>
   import { useRoute, useRouter } from 'vue-router';
@@ -67,5 +67,13 @@
         cursor: pointer;
       }
     }
+  }
+</style>
+
+<style lang="less">
+  // 导航栏下的全局样式
+  .content-wrapper {
+    min-height: calc(100vh - 53px);
+    background: rgba(242, 242, 242, 0.8);
   }
 </style>

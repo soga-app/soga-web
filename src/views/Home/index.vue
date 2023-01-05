@@ -2,7 +2,14 @@
   import { readonly } from 'vue';
   import Calendar from './components/Calendar.vue';
   import { UtilityMap } from './index';
+  import { useRouter } from 'vue-router';
+  const router = useRouter();
+
   const utilityList = readonly(['translate', 'oraltrain', 'community', 'reciteword']);
+
+  function goTo(path: 'Dictionary' | 'Translate' | 'Oraltrain' | 'Community' | 'Reciteword') {
+    router.push({ name: path });
+  }
 </script>
 
 <template>
@@ -13,7 +20,7 @@
           <div class="everyday-card">
             <div class="card-up">
               <div class="card-up-left">每日一记</div>
-              <div class="card-up-right">点击跳转词典</div>
+              <div class="card-up-right" @click="goTo('Dictionary')">点击跳转词典</div>
             </div>
             <div class="card-down">
               <div class="word">
