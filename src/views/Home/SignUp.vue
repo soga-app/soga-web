@@ -45,6 +45,14 @@
                   size="large"
                 />
               </n-form-item-row>
+              <n-form-item-row path="fieldEmail">
+                <n-input
+                  v-model:value="model.fieldEmail"
+                  placeholder="邮箱"
+                  clearable
+                  size="large"
+                />
+              </n-form-item-row>
             </n-form>
             <n-button type="primary" block strong @click="signup"> 立即注册 </n-button>
             <div class="register-link">
@@ -88,6 +96,12 @@
       required: true,
       trigger: 'change',
       message: '请选择性别'
+    },
+    fieldEmail: {
+      required: true,
+      message: '请正确输入邮箱',
+      pattern: /^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/,
+      trigger: ['input', 'blur']
     }
   };
   const signup = (e: MouseEvent) => {
@@ -99,7 +113,8 @@
             name: model.fieldUsername,
             password: model.fieldPassword,
             gender: model.fieldGender,
-            phone: model.fieldPhone
+            phone: model.fieldPhone,
+            email: model.fieldEmail
           });
           window.$message.success('注册成功');
           router.push('./login');
@@ -113,7 +128,8 @@
     fieldPassword: '',
     fieldPhone: '',
     fieldUsername: '',
-    fieldGender: ''
+    fieldGender: '',
+    fieldEmail: ''
   });
 </script>
 
@@ -148,7 +164,7 @@
     .card-container {
       flex: 1;
       .n-card {
-        margin: 100px 0 0 150px;
+        margin: 75px 0 0 150px;
         width: 450px;
         .radio-space {
           width: 400px;

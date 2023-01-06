@@ -11,5 +11,10 @@ export namespace User {
     password: string;
     gender: string;
     phone: string;
+    email: string;
+  }
+
+  interface SendToEmailParams {
+    email: string;
   }
 }

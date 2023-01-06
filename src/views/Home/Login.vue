@@ -10,7 +10,7 @@
         <img class="img" src="../../assets/img/qrcode.png" alt="二维码" />
         <n-tabs default-value="login-by-password" size="large" justify-content="space-evenly">
           <n-tab-pane name="login-by-password" tab="密码登录">
-            <n-form ref="formInstRef" :rules="rules" :model="model">
+            <n-form ref="accountFormInstRef" :rules="rules" :model="model">
               <n-form-item-row path="fieldUsername">
                 <n-input
                   v-model:value="model.fieldUsername"
@@ -41,13 +41,13 @@
             >
               忘记密码
             </n-button>
-            <n-button type="primary" block strong @click="login"> 登录 </n-button>
+            <n-button type="primary" block strong @click="loginWithPwd"> 登录 </n-button>
             <div class="register-link">
               没有账号？<router-link to="/signup">立即注册</router-link>
             </div>
           </n-tab-pane>
           <n-tab-pane name="login-by-verification" tab="验证码登录">
-            <n-form :rules="rules" :model="model">
+            <n-form ref="emailFormInstRef" :rules="rules" :model="model">
               <n-form-item-row path="fieldEmail">
                 <n-input
                   v-model:value="model.fieldEmail"
@@ -58,8 +58,28 @@
               </n-form-item-row>
               <n-form-item-row>
                 <n-input-group>
-                  <n-input :style="{ width: '85%' }" placeholder="验证码" clearable size="large" />
-                  <n-button type="primary" ghost> 获取验证码 </n-button>
+                  <n-input
+                    v-model:value="model.fieldVerifyCode"
+                    :style="{ width: '85%' }"
+                    placeholder="验证码"
+                    clearable
+                    size="large"
+                  />
+                  <n-button
+                    type="primary"
+                    ghost
+                    :disabled="countdownFlag === 1"
+                    @click="emailValidate"
+                  >
+                    <span v-if="!countdownFlag">获取验证码</span>
+                    <span v-else style="font-variant-numeric: tabular-nums">
+                      <n-countdown
+                        :render="renderCountdown"
+                        :duration="120 * 1000"
+                        :active="countdownFlag === 1"
+                      />
+                    </span>
+                  </n-button>
                 </n-input-group>
               </n-form-item-row>
             </n-form>
@@ -74,7 +94,9 @@
             >
               忘记密码
             </n-button>
-            <n-button type="primary" block strong> 登录 </n-button>
+            <n-button type="primary" block strong @click="loginWithEmail">
+              <span>登录</span>
+            </n-button>
             <div class="register-link">
               没有账号？<router-link to="/signup"> 立即注册</router-link>
             </div>
@@ -87,13 +109,16 @@
 
 <script setup lang="ts">
   import { ref, reactive } from 'vue';
-  import { FormInst } from 'naive-ui';
+  import { FormInst, CountdownProps } from 'naive-ui';
   import api from '@/api';
   import { GlobalStore } from '@/stores';
   import { useRouter } from 'vue-router';
   const router = useRouter();
   const globalStore = GlobalStore();
-  const formInstRef = ref<FormInst | null>(null);
+  let countdownFlag = ref(0);
+
+  const accountFormInstRef = ref<FormInst | null>(null);
+  const emailFormInstRef = ref<FormInst | null>(null);
   const rules = {
     fieldEmail: {
       required: true,
@@ -126,22 +151,70 @@
       trigger: ['input', 'blur']
     }
   };
+  const renderCountdown: CountdownProps['render'] = ({ minutes, seconds }) => {
+    return `${String(minutes).padStart(1, '0')}:${String(seconds).padStart(2, '0')}`;
+  };
   const model = reactive({
     fieldPassword: '',
     fieldPhone: '',
     fieldUsername: '',
-    fieldEmail: ''
+    fieldEmail: '',
+    fieldVerifyCode: ''
   });
-  const login = (e: MouseEvent) => {
+  const countDown = () => {
+    countdownFlag.value = 1;
+    setTimeout(() => {
+      countdownFlag.value = 0;
+    }, 120000);
+  };
+  const emailValidate = (e: MouseEvent) => {
     e.preventDefault();
-    formInstRef.value?.validate(async (errors) => {
+    emailFormInstRef.value?.validate(async (errors) => {
       if (!errors) {
         console.log('验证通过');
-        console.log(formInstRef.value);
+        console.log(emailFormInstRef.value);
+        try {
+          await api.user.sendToEmail({
+            email: model.fieldEmail
+          });
+          await countDown();
+          window.$message.success('发送成功，请在120秒内完成验证');
+        } catch (error) {}
+      } else {
+        console.log(errors);
+      }
+    });
+  };
+  const loginWithPwd = (e: MouseEvent) => {
+    e.preventDefault();
+    accountFormInstRef.value?.validate(async (errors) => {
+      if (!errors) {
+        console.log('验证通过');
+        console.log(accountFormInstRef.value);
         try {
           const res = await api.user.login({
             username: model.fieldUsername,
             password: model.fieldPassword
+          });
+          window.$message.success('登录成功！');
+          globalStore.setToken(res);
+          router.push('./index');
+        } catch (error) {}
+      } else {
+        console.log(errors);
+      }
+    });
+  };
+  const loginWithEmail = (e: MouseEvent) => {
+    e.preventDefault();
+    emailFormInstRef.value?.validate(async (errors) => {
+      if (!errors) {
+        console.log('验证通过');
+        console.log(emailFormInstRef.value);
+        try {
+          const res = await api.user.login({
+            email: model.fieldEmail,
+            verifyCode: model.fieldVerifyCode
           });
           window.$message.success('登录成功！');
           globalStore.setToken(res);

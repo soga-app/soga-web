@@ -3,5 +3,7 @@ import { User } from './index.d';
 
 export default {
   login: (params: User.LoginParams): Promise<string> => http.post('api/user/login', params),
-  signUp: (params: User.RegisterParams): Promise<void> => http.post('api/user/insert', params)
+  signUp: (params: User.RegisterParams): Promise<void> => http.post('api/user/insert', params),
+  sendToEmail: (params: User.SendToEmailParams): Promise<string> =>
+    http.post('api/user/sendToEmail', params)
 };

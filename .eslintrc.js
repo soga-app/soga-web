@@ -31,20 +31,8 @@ module.exports = {
     '@typescript-eslint/ban-types': 'off',
     '@typescript-eslint/no-non-null-assertion': 'off',
     '@typescript-eslint/explicit-module-boundary-types': 'off',
-    '@typescript-eslint/no-unused-vars': [
-      'error',
-      {
-        argsIgnorePattern: '^h$',
-        varsIgnorePattern: '^h$'
-      }
-    ],
-    'no-unused-vars': [
-      'error',
-      {
-        argsIgnorePattern: '^h$',
-        varsIgnorePattern: '^h$'
-      }
-    ],
+    '@typescript-eslint/no-unused-vars': 'off',
+    'no-unused-vars': 'off',
     'space-before-function-paren': 'off',
     quotes: ['error', 'single'],
     'comma-dangle': ['error', 'never'],
