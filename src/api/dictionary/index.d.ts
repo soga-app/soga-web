@@ -5,15 +5,20 @@ export namespace Dic {
     female: string;
     male: string;
     luomayin: string;
-    meaning: Array<string>;
+    meaning: string;
     pingJm: Array<string>;
     pianJm: Array<string>;
-    setentce: Array<Sentence>;
-    jyc: Array<string>;
-    xjc: Array<string>;
+    sentence: Array<Sentence> | null;
+    jyc: Array<string> | null;
+    xjc: Array<string> | null;
   }
   interface Sentence {
     Chinese: string;
     Japanese: string;
+  }
+  interface WordRelated {
+    word: string;
+    wordId: string;
+    meaning?: string;
   }
 }

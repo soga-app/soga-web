@@ -2,54 +2,259 @@
   <div class="wordcard">
     <div class="word-layer">
       <div class="word-layer-first">
-        <div class="word-layer-first-word">{{ wordInfo.word }}</div>
-        <div class="word-layer-first-lmy">[{{ wordInfo.luomayin }}]</div>
-        <div class="word-layer-first-audio">
-          <div class="audio-icon-female">
-            <svg-icon color="#e695bb" font-size="20px" name="icon-mic" />
+        <div class="wordInfo-word">{{ wordInfo.word }}</div>
+        <div class="wordInfo-lmy">[{{ wordInfo.luomayin }}]</div>
+        <div class="wordInfo-audio">
+          <div class="wordInfo-audio-female">
+            <svg-icon
+              color="#e695bb"
+              font-size="20px"
+              name="icon-mic"
+              @click="playAudio('female')"
+            />
+            <audio id="femaleAudio" :src="wordInfo.female"></audio>
           </div>
-          <div class="audio-icon-male"></div>
+          <div class="wordInfo-audio-male">
+            <svg-icon color="#6483cf" font-size="20px" name="icon-mic" @click="playAudio('male')" />
+            <audio id="maleAudio" :src="wordInfo.male"></audio>
+          </div>
           <div></div>
         </div>
       </div>
-      <div class="word-layer-second"></div>
-      <div class="word-layer-meaning"></div>
-      <div class="word-layer-remain"></div> </div
-  ></div>
+      <div class="word-layer-second">
+        <div class="left" style="margin-right: 40px"
+          ><div class="word-key">平假名</div> <div class="word-value">{{ wordInfo.pingJm }}</div>
+        </div>
+        <div class="right"
+          ><div class="word-key">片假名</div> <div class="word-value">{{ wordInfo.pianJm }}</div>
+        </div>
+      </div>
+      <div class="word-layer-meaning"
+        ><div class="word-key">释义</div>
+        <div class="word-value">{{ wordInfo.meaning }}</div>
+      </div>
+      <div class="word-remain" :style="{ marginBottom: wordInfo.jyc ? '14px' : '22px' }">
+        <div class="word-key">近义词</div>
+        <div class="word-value">
+          <div v-if="wordInfo.jyc && wordInfo.jyc.length" class="word-list">
+            <div
+              v-for="(item, index) in wordInfo.jyc"
+              :key="index"
+              class="word-list-each"
+              @click="handleSearch(item)"
+              >{{ item }}</div
+            >
+          </div>
+          <span v-else class="empty-data">暂无数据</span>
+        </div>
+      </div>
+      <div class="word-remain" :style="{ marginBottom: wordInfo.xjc ? '14px' : '22px' }">
+        <div class="word-key">形近词</div>
+        <div class="word-value"
+          ><div v-if="wordInfo.xjc && wordInfo.xjc.length" class="word-list">
+            <div
+              v-for="(item, index) in wordInfo.xjc"
+              :key="index"
+              class="word-list-each"
+              @click="handleSearch(item)"
+              >{{ item }}</div
+            >
+          </div>
+          <span v-else class="empty-data">暂无数据</span>
+        </div>
+      </div>
+      <div class="word-remain">
+        <div class="word-key">双语例句</div>
+        <div class="word-value">
+          <div v-if="wordInfo.sentence && wordInfo.sentence.length" class="sent-list">
+            <div v-for="(item, index) in wordInfo.sentence" :key="index" class="sent-list-sentence">
+              <div class="sent-info">
+                <div class="sent-info-left">
+                  <div
+                    class="sent-info-japan"
+                    v-html="getHighlight(`${index + 1}. ${item.Japanese}`, wordInfo.word)"
+                  >
+                  </div>
+                  <div class="sent-info-china">{{ item.Chinese }}</div>
+                </div>
+                <div class="sent-info-right">
+                  <div class="sent-info-icon">
+                    <svg-icon color="#7f98d6" font-size="16px" name="icon-copy" class="icon-copy" />
+                    <svg-icon
+                      color="#7f98d6"
+                      font-size="16px"
+                      name="icon-favorite"
+                      class="icon-favorite"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <span v-else class="empty-data">暂无数据</span>
+        </div>
+      </div>
+    </div></div
+  >
 </template>
 
 <script lang="ts" setup>
   import { Dic } from '@/api/dictionary/index.d';
+  import { watch } from 'vue';
 
   interface Props {
     wordInfo: Dic.WordInfo;
   }
 
+  const emits = defineEmits(['searchWord']);
   const props = defineProps<Props>();
+
+  watch(
+    () => props.wordInfo,
+    (newVal: any, oldVal: any) => {
+      console.log('wordInfo changed ,xjm is', newVal.xjc, typeof newVal.xjc);
+    }
+  );
+
+  // 关键词在例句中高亮
+  function getHighlight(concent: string, keyword: string) {
+    let replaceReg = new RegExp(keyword, 'g'); //正则
+    let replaceString =
+      '<span class="highlight-text" style="color: #587acb">' + keyword + '</span>'; //拼接
+    let titleString: any = concent.replace(replaceReg, replaceString); //替换
+    return titleString;
+  }
+
+  function playAudio(type: 'female' | 'male') {
+    let audio: HTMLAudioElement;
+    switch (type) {
+      case 'female':
+        audio = document.getElementById('femaleAudio') as HTMLAudioElement;
+        break;
+      case 'male':
+        audio = document.getElementById('maleAudio') as HTMLAudioElement;
+        break;
+    }
+    audio.play();
+  }
+
+  function handleSearch(word: string) {
+    emits('searchWord', word);
+  }
 </script>
 
 <style lang="less" scoped>
-  div[class^='word-layer'] {
-    display: flex;
-    color: #8a8a8a;
-  }
-
   .wordcard {
-    background: #fff;
     padding: 24px;
+    width: 682px;
+    div[class^='word-layer-'] {
+      display: flex;
+      color: #8a8a8a;
+      margin-bottom: 22px;
+      align-items: center;
+    }
+    .word-remain {
+      display: flex;
+      margin-bottom: 22px;
+    }
+    .word-key {
+      width: 74px;
+      height: 26px;
+      color: #fff;
+      background: #587acb;
+      border-radius: 4px 4px 4px 4px;
+      font-size: 14px;
+      margin-right: 20px;
+      display: inline-block;
+      text-align: center;
+      line-height: 26px;
+      flex-shrink: 0;
+    }
+    .word-value {
+      display: inline-block;
+      font-size: 14px;
+      font-family: Noto Sans SC-Regular, Noto Sans SC;
+      font-weight: 400;
+      color: #8a8a8a;
+      line-height: 21px;
+      .word-list {
+        display: flex;
+        flex-wrap: wrap;
+        margin-top: 4px;
+        &-each {
+          margin-right: 16px;
+          margin-bottom: 8px;
+          cursor: pointer;
+          &:hover {
+            color: #587acb;
+          }
+        }
+      }
+      .sent-list {
+        &-sentence {
+          .sent-info {
+            margin-bottom: 16px;
+            display: flex;
+            &-left {
+              margin-right: 6px;
+              &:hover {
+                background-color: #5d80d016;
+              }
+            }
+            &-japan {
+              font-weight: 600;
+            }
+            &-china {
+              margin-left: 18px;
+            }
+            &-icon {
+              flex-shrink: 0;
+              width: 36px;
+              .icon-copy {
+                cursor: pointer;
+                margin-right: 4px;
+                &:hover {
+                  color: #587acb;
+                }
+              }
+              .icon-favorite {
+                cursor: pointer;
+              }
+            }
+          }
+        }
+      }
+    }
 
     .word-layer-first {
-      font-size: 16px;
+      font-size: 18px;
       font-weight: bold;
       font-family: Noto Sans SC-Bold, Noto Sans SC;
       align-items: center;
-      &-word {
-        margin-right: 40px;
-        color: #8a8a8a;
+      .wordInfo {
+        &-word {
+          margin-right: 40px;
+          color: #8a8a8a;
+        }
+        &-lmy {
+          color: #8a8a8a;
+          margin-right: 22px;
+        }
+        &-audio {
+          display: flex;
+          align-items: center;
+          &-female {
+            margin-right: 16px;
+            cursor: pointer;
+          }
+          &-male {
+            cursor: pointer;
+          }
+        }
       }
-      &-lmy {
-        color: #8a8a8a;
-      }
+    }
+    .empty-data {
+      line-height: 26px;
     }
   }
 </style>

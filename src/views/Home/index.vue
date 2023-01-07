@@ -1,35 +1,23 @@
-<script lang="ts" setup>
-  import { readonly } from 'vue';
-  import Calendar from './components/Calendar.vue';
-  import { UtilityMap } from './index';
-  import { useRouter } from 'vue-router';
-  const router = useRouter();
-
-  const utilityList = readonly(['translate', 'oraltrain', 'community', 'reciteword']);
-
-  function goTo(path: 'Dictionary' | 'Translate' | 'Oraltrain' | 'Community' | 'Reciteword') {
-    router.push({ name: path });
-  }
-</script>
-
 <template>
   <div class="home-wrapper home">
     <div class="home-content">
       <div class="home-left">
         <div class="home-left-up">
-          <div class="everyday-card">
+          <div v-if="wordDaily" class="everyday-card">
             <div class="card-up">
               <div class="card-up-left">每日一记</div>
-              <div class="card-up-right" @click="goTo('Dictionary')">点击跳转词典</div>
+              <div class="card-up-right" @click="goTo('Dictionary', { word: wordDaily.word })"
+                >点击跳转词典</div
+              >
             </div>
             <div class="card-down">
               <div class="word">
-                <div class="word-text">がおわる</div>
+                <div class="word-text">{{ wordDaily.word }}</div>
                 <div class="word-audio">
                   <svg-icon name="icon-laba" color="#fff" />
                 </div>
               </div>
-              <div class="meaning">终了，结束 </div>
+              <div class="meaning">{{ wordDaily.meaning }} </div>
             </div>
           </div>
         </div>
@@ -60,6 +48,31 @@
     </div>
   </div>
 </template>
+
+<script lang="ts" setup>
+  import { readonly, onMounted, ref } from 'vue';
+  import Calendar from './components/Calendar.vue';
+  import { UtilityMap } from './index';
+  import { useRouter } from 'vue-router';
+  import api from '@/api';
+  const router = useRouter();
+
+  let wordDaily = ref();
+
+  const utilityList = readonly(['translate', 'oraltrain', 'community', 'reciteword']);
+
+  onMounted(async () => {
+    wordDaily.value = await api.dictionary.getDailyWord();
+  });
+
+  function goTo(
+    path: 'Dictionary' | 'Translate' | 'Oraltrain' | 'Community' | 'Reciteword',
+    query?: any,
+    param?: any
+  ) {
+    router.push({ name: path, query });
+  }
+</script>
 
 <style scoped lang="less">
   @bgColorSet: {
