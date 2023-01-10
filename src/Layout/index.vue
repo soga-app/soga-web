@@ -2,7 +2,7 @@
   <div v-if="!hideNav" class="nav nav_wrapper">
     <div class="nav-left">
       <div class="nav-left-logo" @click="goTo('homePage')"
-        ><img src="../assets/logo.png" alt="" style="width: 112px; height: 65px" />
+        ><img src="../assets/logo1.png" alt="" style="width: 112px; height: 40px" />
       </div>
     </div>
     <div class="nav-right">
@@ -41,7 +41,7 @@
 <style scoped lang="less">
   .nav_wrapper {
     padding: 0 100px 0 100px;
-    height: 65px;
+    height: 53px;
     background: #587acb;
     box-shadow: 0px 4px 4px 0px rgba(138, 138, 138, 0.25);
     border-radius: 0px 0px 0px 0px;
