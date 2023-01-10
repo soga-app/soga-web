@@ -1,8 +1,9 @@
 <template>
   <div v-if="!hideNav" class="nav nav_wrapper">
     <div class="nav-left">
-      <div class="nav-left-logo"></div>
-      <div class="nav-left-title" @click="goTo('homePage')">SOGA 日语</div>
+      <div class="nav-left-logo" @click="goTo('homePage')"
+        ><img src="../assets/logo.png" alt="" style="width: 112px; height: 65px" />
+      </div>
     </div>
     <div class="nav-right">
       <n-space :size="38">
@@ -39,7 +40,8 @@
 </script>
 <style scoped lang="less">
   .nav_wrapper {
-    padding: 16px 100px;
+    padding: 0 100px 0 100px;
+    height: 65px;
     background: #587acb;
     box-shadow: 0px 4px 4px 0px rgba(138, 138, 138, 0.25);
     border-radius: 0px 0px 0px 0px;
@@ -51,10 +53,7 @@
     align-items: center;
 
     &-left {
-      &-title {
-        font-size: 16px;
-        font-weight: bold;
-        line-height: 21px;
+      &-logo {
         cursor: pointer;
       }
     }

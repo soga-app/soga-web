@@ -1,13 +1,16 @@
 <template
   ><div class="dictionary">
     <div class="dictionary-content">
-      <div class="search">
+      <div class="search" @mouseleave="leave" @mouseenter="enter">
         <n-input
           v-model:value="searchWord"
           type="text"
           placeholder="请输入要查询的单词"
           clearable
-          @input="handleInputChange"
+          class="search-input"
+          @input="handleInputChange()"
+          @focus="searchOptionShow = searchWord ? true : false"
+          @clear="wordRelatedOptions = []"
         >
           <template #suffix>
             <svg-icon
@@ -19,7 +22,7 @@
           </template>
         </n-input>
         <div
-          v-if="wordRelatedOptions && wordRelatedOptions.length && searchOptionShow"
+          v-show="wordRelatedOptions && wordRelatedOptions.length && searchOptionShow"
           class="dropdown"
         >
           <div class="dropdown-inner">
@@ -28,8 +31,10 @@
               :key="item.key"
               class="dropdown-option"
               @click="handelOptionChecked(item.key)"
-              >{{ item.label }}</div
             >
+              <span class="dropdown-option-left">{{ item.label.word }}</span>
+              <span class="dropdown-option-right">{{ item.label.meaning }}</span>
+            </div>
           </div>
         </div>
       </div>
@@ -47,8 +52,8 @@
   import { ref, watch } from 'vue';
   import WordCard from './components/WordCard.vue';
   import api from '@/api';
-  import { Dic } from '@/api/dictionary/index.d';
   import { useRoute } from 'vue-router';
+  import { throttle } from '@/util';
 
   let wordInfo = ref();
   const route = useRoute();
@@ -72,23 +77,34 @@
     { immediate: true }
   );
 
-  async function handleInputChange(val: string) {
-    console.log('input val:', val);
+  const handleInputChange = throttle(async function () {
+    let val = searchWord.value;
     if (val) {
       wordRelatedOptions.value = [];
       wordRelatedList.value = await api.dictionary.getRelatedWord(val);
       console.log('related list is', wordRelatedList);
       wordRelatedList.value.forEach((i: any) => {
-        wordRelatedOptions.value.push({ label: i.word, key: i.word });
+        const { word, meaning } = i;
+        wordRelatedOptions.value.push({ label: { word, meaning }, key: word });
       });
       searchOptionShow.value = true;
+    } else {
+      wordRelatedOptions.value = [];
+      wordRelatedList.value = [];
     }
-  }
+  });
 
   function handelOptionChecked(checkedOption: string) {
     searchOptionShow.value = false;
     searchWord.value = checkedOption;
     getWordInfo(checkedOption);
+  }
+  function leave() {
+    searchOptionShow.value = false;
+  }
+
+  function enter() {
+    searchOptionShow.value = true;
   }
 </script>
 
@@ -103,11 +119,16 @@
         position: relative;
         margin: 16px auto;
         width: 730px;
+        &:hover .dropdown {
+          display: block;
+        }
         .dropdown {
           background: #fff;
           position: absolute;
           box-shadow: 1px 1px 1px 1px rgba(0, 0, 0, 0.208);
           width: 730px;
+          top: 34px;
+          left: 0;
           &-inner {
             padding: 4px;
           }
@@ -115,8 +136,18 @@
             height: 24px;
             line-height: 24px;
             color: #8a8a8a;
+            cursor: pointer;
             &:hover {
               background-color: #5d80d016;
+            }
+            &-left,
+            &-right {
+              display: inline-block;
+            }
+            &-right {
+              margin-left: 8px;
+              font-size: 12px;
+              color: #8a8a8aed;
             }
           }
         }

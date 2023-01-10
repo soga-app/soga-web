@@ -63,7 +63,7 @@
           <span v-else class="empty-data">暂无数据</span>
         </div>
       </div>
-      <div class="word-remain">
+      <div class="word-remain" :style="{ marginBottom: '0' }">
         <div class="word-key">双语例句</div>
         <div class="word-value">
           <div v-if="wordInfo.sentence && wordInfo.sentence.length" class="sent-list">
@@ -79,7 +79,13 @@
                 </div>
                 <div class="sent-info-right">
                   <div class="sent-info-icon">
-                    <svg-icon color="#7f98d6" font-size="16px" name="icon-copy" class="icon-copy" />
+                    <svg-icon
+                      color="#7f98d6"
+                      font-size="16px"
+                      name="icon-copy"
+                      class="icon-copy"
+                      @click="copy(`${item.Japanese}\n${item.Chinese}`)"
+                    />
                     <svg-icon
                       color="#7f98d6"
                       font-size="16px"
@@ -101,6 +107,7 @@
 <script lang="ts" setup>
   import { Dic } from '@/api/dictionary/index.d';
   import { watch } from 'vue';
+  import useClipboard from 'vue-clipboard3';
 
   interface Props {
     wordInfo: Dic.WordInfo;
@@ -141,6 +148,17 @@
   function handleSearch(word: string) {
     emits('searchWord', word);
   }
+
+  const { toClipboard } = useClipboard();
+  const copy = async (copyText: string) => {
+    try {
+      await toClipboard(copyText);
+      window.$message.success(`${copyText}已经成功复制到您的粘贴板！`);
+    } catch (e) {
+      console.error(e);
+    }
+    return { copy };
+  };
 </script>
 
 <style lang="less" scoped>
