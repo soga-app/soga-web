@@ -39,10 +39,7 @@
         </div>
       </div>
       <div class="word-content">
-        <template v-if="!wordInfo">
-          <div> </div>
-        </template>
-        <word-card v-else :word-info="wordInfo" @search-word="getWordInfo" />
+        <word-card :word-info="wordInfo" @search-word="handelSearchWord" />
       </div>
     </div>
   </div>
@@ -106,6 +103,10 @@
   function enter() {
     searchOptionShow.value = true;
   }
+  async function handelSearchWord(word: string) {
+    wordInfo.value = [];
+    getWordInfo(word);
+  }
 </script>
 
 <style scoped lang="less">
@@ -119,6 +120,9 @@
         position: relative;
         margin: 16px auto;
         width: 730px;
+        .search-icon {
+          cursor: pointer;
+        }
         &:hover .dropdown {
           display: block;
         }
@@ -129,10 +133,13 @@
           width: 730px;
           top: 34px;
           left: 0;
+          max-height: 600px;
+          transition: max-height 2s linear;
           &-inner {
             padding: 4px;
           }
           &-option {
+            max-height: 40px;
             height: 24px;
             line-height: 24px;
             color: #8a8a8a;
@@ -155,9 +162,6 @@
       .word-content {
         min-height: calc(100vh - 138px);
         background: #fff;
-      }
-      .search-icon {
-        cursor: pointer;
       }
     }
   }

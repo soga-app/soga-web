@@ -1,6 +1,9 @@
 <template>
   <div class="wordcard">
-    <div class="word-layer">
+    <template v-if="!wordInfo">
+      <list-loading :row="3" />
+    </template>
+    <div v-else class="word-layer">
       <div class="word-layer-first">
         <div class="wordInfo-word">{{ wordInfo.word }}</div>
         <div class="wordInfo-lmy">[{{ wordInfo.luomayin }}]</div>
@@ -100,8 +103,8 @@
           <span v-else class="empty-data">暂无数据</span>
         </div>
       </div>
-    </div></div
-  >
+    </div>
+  </div>
 </template>
 
 <script lang="ts" setup>
