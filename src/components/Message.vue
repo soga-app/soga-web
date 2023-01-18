@@ -1,6 +1,8 @@
 <template>
   <div>
-    <router-view />
+    <suspense>
+      <router-view />
+    </suspense>
   </div>
 </template>
 <script lang="ts" setup>

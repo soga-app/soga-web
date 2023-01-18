@@ -6,8 +6,21 @@
       </div>
     </div>
     <div class="nav-right">
-      <n-space :size="38">
-        <div class="nav-right-option" @click="goTo('regLogin')">登录/注册</div>
+      <n-space :size="38" align="center">
+        <div>
+          <div v-if="!userStore.getToken" class="nav-right-option" @click="goTo('regLogin')"
+            >登录/注册</div
+          >
+          <div v-else class="head-pic">
+            <n-dropdown trigger="hover" :options="options" @select="handleSelect">
+              <img
+                :src="userStore.getGender === '男' ? boyImg : girlImg"
+                alt=""
+                style="width: 48px; height: 48px"
+              />
+            </n-dropdown>
+          </div>
+        </div>
         <div class="nav-right-option" @click="goTo('userCenter')">个人中心</div>
         <div class="nav-right-option">足迹</div>
       </n-space>
@@ -16,15 +29,46 @@
   <div class="content-wrapper"><router-view></router-view> </div>
 </template>
 <script lang="ts" setup>
+  import api from '@/api';
+  import girlImg from '@/assets/img/user/girl.png';
+  import boyImg from '@/assets/img/user/boy.png';
+  import { UserStore } from '@/stores';
   import { useRoute, useRouter } from 'vue-router';
   import { computed } from 'vue';
   const route = useRoute();
   const router = useRouter();
-
+  const userStore = UserStore();
   let hideNav = computed(() => {
     return route.meta.hideNav;
   });
-
+  let options = [
+    {
+      label: '退出登录',
+      key: 'logout'
+    },
+    {
+      label: '修改信息',
+      key: 'changeInformation'
+    },
+    {
+      label: '修改密码',
+      key: 'changePassword'
+    }
+  ];
+  function handleSelect(key: string | number) {
+    switch (key) {
+      case 'logout':
+        api.user.logout();
+        window.localStorage.clear();
+        router.push('./login');
+        break;
+      case 'changeInformation':
+        router.push('./updateInformation');
+        break;
+      case 'changePassword':
+        router.push('./updatePassword');
+    }
+  }
   function goTo(curPath: string) {
     switch (curPath) {
       case 'regLogin':

@@ -9,6 +9,4 @@ import '@/style/global.less';
 
 const app = createApp(App);
 
-app.use(plugin);
-
-app.use(router).use(naive).use(pinia).mount('#app');
+app.use(pinia).use(plugin).use(router).use(naive).mount('#app');

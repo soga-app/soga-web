@@ -17,7 +17,9 @@
           <div class="user-info-up-right">退出登录 </div>
         </div>
         <div class="user-info-down">
-          <div class="user-info-down-left">修改个人资料</div>
+          <div class="user-info-down-left">
+            <router-link to="/updateInformation"> 修改个人资料 </router-link>
+          </div>
           <div class="user-info-down-mid">|</div>
           <div class="user-info-down-right">学习数据</div>
         </div>
@@ -126,12 +128,16 @@
         justify-content: space-evenly;
         font-weight: bold;
         color: #587acb;
-        font-weight: 13px;
         height: 40px;
         align-items: center;
         background: #cfd8ef;
         border-radius: 0 0 6px 6px;
-        &-left,
+        &-left {
+          a {
+            color: #587acb;
+            text-decoration: none;
+          }
+        }
         &-right {
           cursor: pointer;
         }

@@ -17,4 +17,16 @@ export namespace User {
   interface SendToEmailParams {
     email: string;
   }
+
+  interface UpdateParams {
+    age: number;
+    phone: string;
+    email: string;
+    name: string;
+    gender: string;
+  }
+
+  interface validatePasswordParams {
+    password: string;
+  }
 }

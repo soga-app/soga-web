@@ -111,10 +111,10 @@
   import { ref, reactive } from 'vue';
   import { FormInst, CountdownProps } from 'naive-ui';
   import api from '@/api';
-  import { GlobalStore } from '@/stores';
+  import { UserStore } from '@/stores';
   import { useRouter } from 'vue-router';
   const router = useRouter();
-  const globalStore = GlobalStore();
+  const userStore = UserStore();
   let countdownFlag = ref(0);
 
   const accountFormInstRef = ref<FormInst | null>(null);
@@ -197,7 +197,9 @@
             password: model.fieldPassword
           });
           window.$message.success('登录成功！');
-          globalStore.setToken(res);
+          console.log(res, 6656);
+          userStore.setToken(res.token);
+          userStore.setGender(res.user.gender);
           router.push('./index');
         } catch (error) {}
       } else {
@@ -217,7 +219,7 @@
             verifyCode: model.fieldVerifyCode
           });
           window.$message.success('登录成功！');
-          globalStore.setToken(res);
+          userStore.setToken(res.token);
           router.push('./index');
         } catch (error) {}
       } else {

@@ -15,7 +15,10 @@ class RequestHttp {
     this.service.interceptors.request.use(
       (config: any) => {
         // todo 添加token
-
+        const userState = window.localStorage.getItem('UserState');
+        if (userState) {
+          config.headers.authorization = JSON.parse(userState).token;
+        }
         // 序列化get请求
         if (config.method === 'get') {
           config.paramsSerializer = (params: any) => {
@@ -128,7 +131,7 @@ class RequestHttp {
     hasErrTips?: boolean,
     requireOriginalRes?: boolean
   ) {
-    return this.request({ method: 'get', url, data, ...config }, hasErrTips, requireOriginalRes);
+    return this.request({ method: 'put', url, data, ...config }, hasErrTips, requireOriginalRes);
   }
 }
 
