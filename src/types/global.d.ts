@@ -8,3 +8,5 @@ declare global {
     $dialog: DialogApiInjection;
   }
 }
+
+declare type Nullable<T> = T | null;
