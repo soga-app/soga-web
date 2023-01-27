@@ -21,4 +21,38 @@ export namespace Dic {
     wordId: string;
     meaning?: string;
   }
+  interface AddPlanParam {
+    dictId: number;
+    timeSpan: number;
+  }
+  interface Dictionary {
+    count: number;
+    createTime: string;
+    dictType: string;
+    id: number;
+    name: string;
+    summary: string;
+  }
+  interface Plan {
+    count: number;
+    createTime: string;
+    dictId: number;
+    endTime: string;
+    finish: number;
+    goal: number;
+    id: number;
+    name: string;
+    timeSpan: number;
+    updateTime: string;
+    userId: string;
+  }
+  interface TodayWordGoal {
+    plan: Plan;
+    recordId: number;
+    learnedNum: number;
+    learningNum: number;
+    reviewingNum: number;
+    restNum: number;
+    createTime: string;
+  }
 }

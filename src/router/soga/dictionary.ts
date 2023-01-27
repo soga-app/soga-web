@@ -11,7 +11,7 @@ export default [
   },
   {
     path: 'making-plan',
-    name: 'DictionaryPlane',
+    name: 'DictionaryPlan',
     component: () => import('@/views/Dictionary/DictionaryPlan.vue')
   }
 ];
