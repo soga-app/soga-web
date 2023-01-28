@@ -56,7 +56,7 @@
     event.y = tmp.screenY;
     event.original = e;
     // 触发自定义事件
-    (this as any).dispatchEvent(event);
+    // this.dispatchEvent(event);
   }
 
   let startY = 0,
@@ -66,17 +66,18 @@
     times = 0;
   onMounted(() => {
     let length = picker.value?.querySelectorAll('li').length as number;
-    console.log('li is', length);
     // 绑定自定义事件
-    container.value?.addEventListener('slidestart', function ({ y }) {
+    container.value?.addEventListener('slidestart', function (event: any) {
+      let y = event.y;
       dragable = true;
       startY = y;
       picker.value?.classList.remove('transition');
       wrapper.value?.classList.remove('transition');
       container.value?.classList.add('grabbing');
     });
-    document.addEventListener('sliding', function ({ y }) {
+    document.addEventListener('sliding', function (event: any) {
       if (!dragable) return;
+      let y = event.y;
       moveY = y;
       disY = moveY - startY;
       let value = (picker.value?.style as any).getPropertyValue('--top') * 1;
@@ -87,8 +88,9 @@
       (wrapper.value?.style as any).setProperty('--num', num);
       startY = moveY;
     });
-    document.addEventListener('slideend', function ({ y }) {
+    document.addEventListener('slideend', function (event: any) {
       if (!dragable) return;
+      let y = event.y;
       moveY = y;
       const maxTop = (length - 3) * gap;
       disY = moveY - startY;

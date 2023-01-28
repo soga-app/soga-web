@@ -60,13 +60,13 @@
       case 'logout':
         api.user.logout();
         window.localStorage.clear();
-        router.push('./login');
+        router.push({ name: 'Login' });
         break;
       case 'changeInformation':
-        router.push('./updateInformation');
+        router.push({ name: 'UpdateInformation' });
         break;
       case 'changePassword':
-        router.push('./updatePassword');
+        router.push({ name: 'UpdatePassword' });
     }
   }
   function goTo(curPath: string) {

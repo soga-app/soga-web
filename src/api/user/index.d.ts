@@ -29,4 +29,19 @@ export namespace User {
   interface validatePasswordParams {
     password: string;
   }
+  interface UserInfo {
+    user: {
+      id: number;
+      roleId: number;
+      age: number;
+      phone: string;
+      password: string;
+      email: string;
+      name: string;
+      gender: string;
+      avatar: string;
+      createTime: string;
+    };
+    token: string;
+  }
 }
