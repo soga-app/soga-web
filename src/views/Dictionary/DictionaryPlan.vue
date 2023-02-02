@@ -20,7 +20,7 @@
         </n-space>
       </div>
       <div class="plan-day-picker">
-        <input-number-scroll :list="linkList" class="scroll" />
+        <input-number-scroll :list="linkList" class="scroll" @pickOption="handlePickOption" />
       </div>
       <div class="btn"> <n-button type="primary" size="large"> 确定计划 </n-button></div>
     </div>
@@ -46,8 +46,18 @@
       linkList.value.push(`${item}         ${Math.floor(pickWordSum / item)}`);
     });
   });
-  function handlePickDict(id: string) {
+
+  function handlePickDict(id: string, num: number) {
     pickDictId.value = id;
+    let pickWordSum = (dictList.value as Array<Dic.Dictionary>)[num]?.count;
+    linkList.value = [];
+    list.value.forEach((item: number) => {
+      linkList.value.push(`${item}         ${Math.floor(pickWordSum / item)}`);
+    });
+  }
+
+  function handlePickOption(num: number) {
+    console.log('emit num is', num);
   }
 </script>
 

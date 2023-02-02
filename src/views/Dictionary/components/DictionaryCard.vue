@@ -41,7 +41,7 @@
   ]);
 
   function handleCheckDict() {
-    emit('pickDict', props.id);
+    emit('pickDict', props.id, props.num);
   }
 </script>
 
@@ -83,6 +83,7 @@
       border-radius: 6px;
     }
     &-info {
+      user-select: none;
       padding: 16px;
       color: #fff;
       font-size: 14px;

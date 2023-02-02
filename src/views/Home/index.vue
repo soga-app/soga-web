@@ -132,7 +132,8 @@
   }
   .home {
     display: flex;
-    padding: 28px 96px;
+    padding-top: 28px;
+    justify-content: center;
     &-left {
       width: 698px;
       .everyday-card {

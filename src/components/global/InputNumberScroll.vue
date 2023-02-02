@@ -1,4 +1,5 @@
 <template>
+  <!-- 该组件默认停在第三个选项 -->
   <div ref="container" class="container">
     <div ref="picker" class="picker" style="--top: 0">
       <ul>
@@ -20,16 +21,17 @@
 </template>
 
 <script lang="ts" setup>
-  import { onMounted, ref } from 'vue';
+  import { onMounted, ref, watch } from 'vue';
 
   const props = defineProps(['list']);
   const picker = ref<HTMLElement | null>(null);
   const wrapper = ref<HTMLElement | null>(null);
   const container = ref<HTMLElement | null>(null);
   const gap = 40;
+  const emit = defineEmits(['pickOption']);
 
   // 事件处理
-  function eventHandler(e: any) {
+  function eventHandler(this: EventTarget, e: any) {
     // e.bubbles = false; //默认跳过冒泡
     e.preventDefault();
     let event: any;
@@ -56,7 +58,7 @@
     event.y = tmp.screenY;
     event.original = e;
     // 触发自定义事件
-    // this.dispatchEvent(event);
+    this.dispatchEvent(event);
   }
 
   let startY = 0,
@@ -64,8 +66,15 @@
     disY = 0,
     dragable = false,
     times = 0;
+  let length = 0;
+  watch(
+    props.list,
+    (newVal) => {
+      length = newVal.length;
+    },
+    { immediate: true }
+  );
   onMounted(() => {
-    let length = picker.value?.querySelectorAll('li').length as number;
     // 绑定自定义事件
     container.value?.addEventListener('slidestart', function (event: any) {
       let y = event.y;
@@ -92,7 +101,7 @@
       if (!dragable) return;
       let y = event.y;
       moveY = y;
-      const maxTop = (length - 3) * gap;
+      let maxTop = (length - 3) * gap;
       disY = moveY - startY;
       let value = (picker.value?.style as any).getPropertyValue('--top') * 1;
       value += disY;
@@ -106,6 +115,7 @@
       container.value?.classList.remove('grabbing');
       startY = moveY;
       dragable = false;
+      emit('pickOption', Math.round(-value / gap) + 2);
     });
 
     // 把鼠标事件与自定义事件进行关联
