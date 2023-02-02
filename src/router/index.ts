@@ -9,9 +9,17 @@ const router = createRouter({
   routes
 });
 
-router.beforeEach(async (to, from, next) => {
+//需要用户登录才能访问的路由
+const needLoginRouteName = ['UserCenter', 'Reciteword', 'Translate', 'Community', 'Oraltrain'];
+
+router.beforeEach((to, from, next) => {
   const userStore = UserStore();
   // NProgress.start();
-  next();
+  if (needLoginRouteName.includes(to.name as string) && !localStorage.getItem('UserState')) {
+    window.$message.warning('请先登录!', { duration: 1000 });
+    next({ name: 'Login' });
+  } else {
+    next();
+  }
 });
 export default router;

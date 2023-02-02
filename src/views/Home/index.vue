@@ -28,6 +28,7 @@
               :key="index"
               :style="{ marginRight: (index + 1) % 2 !== 0 ? '74px' : '0' }"
               :class="`utility-card card-bg-color-${item}`"
+              @click="handleCardGo(item)"
             >
               <div :class="`utility-card-inner card-bg-image-${item}`">
                 <span class="utility-card-text">{{ UtilityMap[item] }} </span>
@@ -65,11 +66,18 @@
     wordDaily.value = await api.dictionary.getDailyWord();
   });
 
-  function goTo(
-    path: 'Dictionary' | 'Translate' | 'Oraltrain' | 'Community' | 'Reciteword',
-    query?: any,
-    param?: any
-  ) {
+  function capitalizedFirstLetter(s: string) {
+    let first = s[0];
+    console.log('return value is', first.toUpperCase() + s.slice(1));
+    return first.toUpperCase() + s.slice(1);
+  }
+  function handleCardGo(path: string) {
+    const pathName = capitalizedFirstLetter(path);
+    console.log('pathNmae is', pathName);
+    goTo(pathName);
+  }
+
+  function goTo(path: string, query?: any, param?: any) {
     router.push({ name: path, query });
   }
 </script>
@@ -142,7 +150,7 @@
         box-shadow: 0px 8px 40px 0px rgba(138, 138, 138, 0.2);
         border-radius: 4px;
         opacity: 1;
-
+        color: #fff;
         .card-up {
           display: flex;
           justify-content: space-between;

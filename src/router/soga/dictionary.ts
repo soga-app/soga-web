@@ -5,8 +5,8 @@ export default [
     component: () => import('@/views/Dictionary/index.vue')
   },
   {
-    path: 'learning-word',
-    name: 'LearningWord',
+    path: 'reciteword',
+    name: 'Reciteword',
     component: () => import('@/views/Dictionary/LearningWord.vue')
   },
   {
