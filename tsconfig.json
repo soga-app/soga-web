@@ -1,7 +1,7 @@
 {
     "compilerOptions": {
         "types": [
-            "pinia-plugin-persist"
+            "pinia-plugin-persistedstate"
         ],
         "typeRoots": [
             "node_modules/@types", // 默认值

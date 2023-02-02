@@ -34,7 +34,7 @@ class RequestHttp {
     this.service.interceptors.response.use(
       (response: AxiosResponse) => {
         const responseCode = response.status;
-        if (responseCode >= 200 && responseCode < 300) {
+        if ((responseCode >= 200 && responseCode < 300) || responseCode === 304) {
           return Promise.resolve(response);
         } else {
           return Promise.reject(response);
@@ -71,7 +71,7 @@ class RequestHttp {
   async request(config: AxiosRequestConfig, hasErrTips = false, requireOriginalRes = false) {
     try {
       const res = await this.service.request(config);
-      if (res.status === 204) {
+      if (res.status === 204 || res.status === 304) {
         //有缓存
         return Promise.resolve();
       }
