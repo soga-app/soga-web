@@ -61,7 +61,6 @@
 
   const getWordInfo = async (word: string) => {
     wordInfo.value = await api.dictionary.getWordCard(word);
-    console.log('wordInfo is', wordInfo);
   };
 
   watch(

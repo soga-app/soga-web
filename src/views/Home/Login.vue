@@ -171,8 +171,6 @@
     e.preventDefault();
     emailFormInstRef.value?.validate(async (errors) => {
       if (!errors) {
-        console.log('验证通过');
-        console.log(emailFormInstRef.value);
         try {
           await api.user.sendToEmail({
             email: model.fieldEmail
@@ -189,17 +187,15 @@
     e.preventDefault();
     accountFormInstRef.value?.validate(async (errors) => {
       if (!errors) {
-        console.log('验证通过');
-        console.log(accountFormInstRef.value);
         try {
           const res = await api.user.login({
             username: model.fieldUsername,
             password: model.fieldPassword
           });
           window.$message.success('登录成功！');
-          console.log(res, 6656);
+          getHasLearningWordPlan();
           userStore.setToken(res.token);
-          userStore.setGender(res.user.gender);
+          userStore.setUserInfo(res.user);
           router.push('./index');
         } catch (error) {}
       } else {
@@ -211,21 +207,30 @@
     e.preventDefault();
     emailFormInstRef.value?.validate(async (errors) => {
       if (!errors) {
-        console.log('验证通过');
-        console.log(emailFormInstRef.value);
         try {
           const res = await api.user.login({
             email: model.fieldEmail,
             verifyCode: model.fieldVerifyCode
           });
           window.$message.success('登录成功！');
+          getHasLearningWordPlan();
           userStore.setToken(res.token);
+          userStore.setUserInfo(res.user);
           router.push('./index');
         } catch (error) {}
       } else {
         console.log(errors);
       }
     });
+  };
+  const getHasLearningWordPlan = async () => {
+    const res = await api.dictionary.getCurPlan();
+    if (!res.length) {
+      userStore.setHasLearningWordPlan(false);
+    } else {
+      userStore.setHasLearningWordPlan(true);
+    }
+    console.log('res is', res);
   };
 </script>
 

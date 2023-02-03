@@ -30,18 +30,19 @@ export namespace User {
     password: string;
   }
   interface UserInfo {
-    user: {
-      id: number;
-      roleId: number;
-      age: number;
-      phone: string;
-      password: string;
-      email: string;
-      name: string;
-      gender: string;
-      avatar: string;
-      createTime: string;
-    };
+    user: User;
     token: string;
+  }
+  interface User {
+    id: number;
+    roleId: number;
+    age: number;
+    phone: string;
+    password: string;
+    email: string;
+    name: string;
+    gender: string;
+    avatar: string;
+    createTime: string;
   }
 }

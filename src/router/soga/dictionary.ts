@@ -7,6 +7,19 @@ export default [
   {
     path: 'reciteword',
     name: 'Reciteword',
+    beforeEnter: (to: any, from: any, next: any) => {
+      const userState = window.localStorage.getItem('UserState');
+      if (userState) {
+        const hasLearningWordPlan = JSON.parse(userState).hasLearningWordPlan;
+        if (hasLearningWordPlan) {
+          next();
+        } else {
+          next({ name: 'DictionaryPlan' });
+        }
+      } else {
+        next();
+      }
+    },
     component: () => import('@/views/Dictionary/LearningWord.vue')
   },
   {

@@ -1,5 +1,5 @@
 <template>
-  <div class="skeleton" :class="{ padding: hasPadding ? '24px' : '0' }">
+  <div class="skeleton" :style="{ padding: hasPadding ? '24px' : '0' }">
     <div v-for="(num, index) in row" :key="`${num}@${index}`" class="skeleton-each">
       <n-space vertical :size="20">
         <div class="line-1"

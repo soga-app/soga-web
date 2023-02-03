@@ -42,7 +42,11 @@ class RequestHttp {
       },
       (error: any) => {
         //todo 请求重试
-
+        const responseCode = error.response.status;
+        const data = error.response.data;
+        if (responseCode >= 500) {
+          window.$message.error(data.msg);
+        }
         // 断网或者请求超时状态
         if (!error.response) {
           // 请求超时状态
@@ -58,7 +62,15 @@ class RequestHttp {
           return Promise.reject(error);
         }
         // todo token更新
-        //  todo 统一错误码处理
+        switch (responseCode) {
+          //请求错误
+          case 400:
+            window.$message.warning('请求体填写错误');
+            break;
+          case 404:
+            break;
+        }
+        return Promise.reject(error);
       }
     );
   }

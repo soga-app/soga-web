@@ -5,10 +5,13 @@
         <div class="user-info-up">
           <div class="user-info-up-left">
             <div class="head-pic"
-              ><img src="../../assets/img/user/girl.png" alt="" style="width: 68px; height: 68px"
+              ><img
+                :src="userStore.getGender === '男' ? boyImg : girlImg"
+                alt=""
+                style="width: 68px; height: 68px"
             /></div>
             <div class="user-text-info">
-              <div class="name">planetlll</div>
+              <div class="name">{{ userStore.getUserName }}</div>
               <div class="isVip"
                 ><svg-icon name="icon-liebiaoye-VIPjiaobiao" font-size="40px" />
               </div>
@@ -29,7 +32,7 @@
         <div class="plan-card-wrapper">
           <div class="plan-card-up">
             <div class="plan-card-up-left">
-              <div class="dic-name">JLPT-N1词汇 </div>
+              <div class="dic-name">{{ bookName }} </div>
               <div class="plan-setting">
                 <svg-icon name="icon-shezhi" font-size="14px" color="#587acb" />
                 学习设置</div
@@ -38,33 +41,33 @@
             <div class="plan-card-up-right"> 查看词表</div>
           </div>
           <div class="plan-card-mid">
-            <div class="plan-progress">
-              <div class="plan-progress-percent">已完成9.3%</div>
-              <div class="plan-progress-num">225/2416词</div>
+            <div class="plan-process">
+              <div class="plan-process-percent">已完成{{ process }}%</div>
+              <div class="plan-process-num">{{ learned }} /{{ total }} 词</div>
             </div>
-            <n-progress
+            <n-process
               style="margin: 8px auto"
               type="line"
-              :percentage="9.3"
+              :percentage="Number(process)"
               :show-indicator="false"
             />
-            <divc class="plan-progress-tip">-已离线存储进度-</divc>
+            <divc class="plan-process-tip">-已离线存储进度-</divc>
           </div>
           <div class="plan-card-down">
             <div class="learn">
               <div class="word-text">学习</div>
-              <div class="word-num">15</div>
+              <div class="word-num">{{ toCurLearn }}</div>
             </div>
             <div class="review">
-              <div class="word-text">复习</div> <div class="word-num">45</div>
+              <div class="word-text">复习</div> <div class="word-num">{{ toReview }} </div>
             </div>
             <div class="todo">
-              <div class="word-text">未学</div> <div class="word-num">2032</div>
+              <div class="word-text">未学</div> <div class="word-num">{{ toLearn }} </div>
             </div>
           </div>
         </div>
       </div>
-      <div class="learning-button"><n-button type="tertiary"> 继续学习 </n-button> </div>
+      <div class="learning-button"><n-button type="tertiary"> 开始学习 </n-button> </div>
       <div class="vip-service">
         <div class="layer1"
           ><div class="vip-service-left">VIP-SOGA日语学习APP</div>
@@ -80,7 +83,31 @@
   </div>
 </template>
 <script lang="ts" setup>
-  defineProps<{ msg: string }>();
+  import { onMounted, ref } from 'vue';
+  import { UserStore } from '@/stores';
+  import girlImg from '@/assets/img/user/girl.png';
+  import boyImg from '@/assets/img/user/boy.png';
+  import api from '@/api';
+  import { provideCarouselContext } from 'naive-ui/es/carousel/src/CarouselContext';
+
+  const userStore = UserStore();
+  let bookName = ref('');
+  let process = ref('');
+  let toCurLearn = ref(0);
+  let toReview = ref(0);
+  let toLearn = ref(0);
+  let learned = ref(0);
+  let total = ref(0);
+  onMounted(async () => {
+    const res = await api.dictionary.getTodayWordGoal();
+    bookName.value = res.plan.name;
+    process.value = (res.learnedNum / res.plan.count).toFixed(2);
+    toCurLearn.value = res.learningNum;
+    toReview.value = res.reviewingNum;
+    toLearn.value = res.restNum;
+    learned.value = res.learnedNum;
+    total.value = res.plan.count;
+  });
 </script>
 
 <style lang="less" scoped>
@@ -210,14 +237,14 @@
         }
       }
       &-mid {
-        .plan-progress {
+        .plan-process {
           display: flex;
           justify-content: space-between;
           color: #587acb;
           margin: 4px auto;
           font-size: 13px;
         }
-        .plan-progress-tip {
+        .plan-process-tip {
           display: flex;
           justify-content: center;
           margin: 4px auto;
@@ -230,6 +257,7 @@
         color: #587acb;
         font-size: 16px;
         font-weight: bold;
+        text-align: center;
       }
     }
     .learning-button {

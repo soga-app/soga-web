@@ -12,7 +12,7 @@ export default {
   //  查询词典列表
   getDictionary: (): Promise<Array<Dic.Dictionary>> => http.get('/api/dictionary/dictList'),
   // 创建学习计划
-  addPlan: (data: Dic.AddPlanParam): Promise<void> => http.post('/api/plan/insert', data),
+  addPlan: (data: Dic.AddPlanParam) => http.post('/api/plan/insert', data),
   // 更改学习计划
   updatePlan: (data: { planId: number }): Promise<void> => http.put('/api/plan/update', data),
   // 获取当前用户学习计划
@@ -20,5 +20,5 @@ export default {
   // 今日背词目标
   getTodayWordGoal: (): Promise<Dic.TodayWordGoal> => http.get('/api/PlanRecord'),
   // 今日背单词列表
-  getTodayWordList: (): Promise<void> => http.get('/plan/wordList')
+  getTodayWordList: (): Promise<Dic.TodayWordList> => http.get('/api/plan/wordList')
 };

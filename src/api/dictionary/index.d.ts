@@ -55,4 +55,16 @@ export namespace Dic {
     restNum: number;
     createTime: string;
   }
+  interface TodayWordList {
+    learn: Array<LearnCardInfo>;
+    review: Array<LearnCardInfo>;
+  }
+  interface LearnCardInfo {
+    dictId: string;
+    word: string;
+    dictIndex: number;
+    phone: string;
+    voice: string;
+    wordDto: WordInfo;
+  }
 }
