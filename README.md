@@ -1,16 +1,9 @@
-# Vue 3 + TypeScript + Vite
-
-This template should help get you started developing with Vue 3 and TypeScript in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
-
-## Recommended IDE Setup
-
-- [VS Code](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar)
-
-## Type Support For `.vue` Imports in TS
-
-Since TypeScript cannot handle type information for `.vue` imports, they are shimmed to be a generic Vue component type by default. In most cases this is fine if you don't really care about component prop types outside of templates. However, if you wish to get actual prop types in `.vue` imports (for example to get props validation when using manual `h(...)` calls), you can enable Volar's Take Over mode by following these steps:
-
-1. Run `Extensions: Show Built-in Extensions` from VS Code's command palette, look for `TypeScript and JavaScript Language Features`, then right click and select `Disable (Workspace)`. By default, Take Over mode will enable itself if the default TypeScript extension is disabled.
-2. Reload the VS Code window by running `Developer: Reload Window` from the command palette.
-
-You can learn more about Take Over mode [here](https://github.com/johnsoncodehk/volar/discussions/471).
+### 项目介绍
+> “SOGA”日语学习APP依托高度精准的日文翻译中文技术，以深度访谈和问卷调查为基础，为广大具有日语学习需求、不精通日语但具有较高使用要求的人群打造高能日语学习型社区，精准狙击各类日语学习者痛点痒点，满足日语学习中多种需求和应用场景，营造浓厚的日语学习氛围，打造密集型高能型日语学习型社区。
+### 技术栈
++ 前端：Vue3 + TypeScript + Pinia + Vue-Route + Naive UI  
++ 后端: Springboot + MyBatisPlus  
++ 数据库: Mysql  
++ 在线访问: http://43.139.46.117/index  
+### 功能架构
+![image](https://user-images.githubusercontent.com/65109877/190060815-df609a6c-e8ff-453a-85d6-08de342dcf02.png)
