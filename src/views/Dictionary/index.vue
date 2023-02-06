@@ -159,6 +159,7 @@
         }
       }
       .word-content {
+        width: 730px;
         min-height: calc(100vh - 138px);
         background: #fff;
       }

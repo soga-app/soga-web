@@ -1,16 +1,16 @@
 export namespace Dic {
   interface WordInfo {
-    id: string;
+    id?: string;
     word: string;
-    female: string;
-    male: string;
-    luomayin: string;
-    meaning: string;
-    pingJm: Array<string>;
-    pianJm: Array<string>;
-    sentence: Array<Sentence> | null;
-    jyc: Array<string> | null;
-    xjc: Array<string> | null;
+    female?: string;
+    male?: string;
+    luomayin?: string;
+    meaning?: string;
+    pingJm?: Array<string>;
+    pianJm?: Array<string>;
+    sentence?: Array<Sentence>;
+    jyc?: Array<string>;
+    xjc?: Array<string>;
   }
   interface Sentence {
     Chinese: string;
@@ -60,11 +60,17 @@ export namespace Dic {
     review: Array<LearnCardInfo>;
   }
   interface LearnCardInfo {
-    dictId: string;
+    dictId: number;
     word: string;
     dictIndex: number;
     phone: string;
     voice: string;
     wordDto: WordInfo;
+  }
+  interface LearningRecordParam {
+    dictId: number;
+    learnTime: number;
+    learned: number;
+    reviewed: number;
   }
 }

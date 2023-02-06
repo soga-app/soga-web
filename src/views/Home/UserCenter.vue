@@ -45,21 +45,16 @@
               <div class="plan-process-percent">已完成{{ process }}%</div>
               <div class="plan-process-num">{{ learned }} /{{ total }} 词</div>
             </div>
-            <n-process
-              style="margin: 8px auto"
-              type="line"
-              :percentage="Number(process)"
-              :show-indicator="false"
-            />
+            <n-progress type="line" :percentage="percentage" :show-indicator="false" />
             <divc class="plan-process-tip">-已离线存储进度-</divc>
           </div>
           <div class="plan-card-down">
             <div class="learn">
-              <div class="word-text">学习</div>
+              <div class="word-text">待学习</div>
               <div class="word-num">{{ toCurLearn }}</div>
             </div>
             <div class="review">
-              <div class="word-text">复习</div> <div class="word-num">{{ toReview }} </div>
+              <div class="word-text">待复习</div> <div class="word-num">{{ toReview }} </div>
             </div>
             <div class="todo">
               <div class="word-text">未学</div> <div class="word-num">{{ toLearn }} </div>
@@ -89,24 +84,27 @@
   import boyImg from '@/assets/img/user/boy.png';
   import api from '@/api';
   import { provideCarouselContext } from 'naive-ui/es/carousel/src/CarouselContext';
+  import { toDecimal } from '@/util';
 
   const userStore = UserStore();
   let bookName = ref('');
-  let process = ref('');
+  let process = ref(0);
   let toCurLearn = ref(0);
   let toReview = ref(0);
   let toLearn = ref(0);
   let learned = ref(0);
   let total = ref(0);
+  let percentage = ref(0);
   onMounted(async () => {
     const res = await api.dictionary.getTodayWordGoal();
     bookName.value = res.plan.name;
-    process.value = (res.learnedNum / res.plan.count).toFixed(2);
+    process.value = toDecimal(res.learnedNum / res.plan.count);
     toCurLearn.value = res.learningNum;
     toReview.value = res.reviewingNum;
     toLearn.value = res.restNum;
     learned.value = res.learnedNum;
     total.value = res.plan.count;
+    if (process.value !== 0) percentage.value = process.value < 1 ? 1 : process.value;
   });
 </script>
 

@@ -167,7 +167,7 @@
 <style lang="less" scoped>
   .wordcard {
     padding: 24px;
-    width: 682px;
+    width: 100%;
     div[class^='word-layer-'] {
       display: flex;
       color: #8a8a8a;

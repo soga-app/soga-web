@@ -20,5 +20,7 @@ export default {
   // 今日背词目标
   getTodayWordGoal: (): Promise<Dic.TodayWordGoal> => http.get('/api/PlanRecord'),
   // 今日背单词列表
-  getTodayWordList: (): Promise<Dic.TodayWordList> => http.get('/api/plan/wordList')
+  getTodayWordList: (): Promise<Dic.TodayWordList> => http.get('/api/plan/wordList'),
+  // 更新用户单词记录
+  updateLearningRecord: (data: Dic.LearningRecordParam) => http.put('/api/PlanRecord', data)
 };

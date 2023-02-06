@@ -12,3 +12,13 @@ export const throttle = (func: Function, wait = 300) => {
     }
   };
 };
+
+// 将浮点数四舍五入，取小数点后2位
+export const toDecimal = (x: number): number => {
+  let f = parseFloat(x);
+  if (isNaN(f)) {
+    return 0;
+  }
+  f = Math.round(x * 100) / 100;
+  return f;
+};

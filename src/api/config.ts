@@ -69,6 +69,8 @@ class RequestHttp {
             break;
           case 404:
             break;
+          case 401: //用户token过期
+            window.location.href = '/login';
         }
         return Promise.reject(error);
       }
