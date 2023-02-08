@@ -98,11 +98,11 @@
   onMounted(async () => {
     const res = await api.dictionary.getTodayWordGoal();
     bookName.value = res.plan.name;
-    process.value = toDecimal(res.learnedNum / res.plan.count);
+    process.value = toDecimal(res.plan.finish / res.plan.count);
     toCurLearn.value = res.learningNum;
     toReview.value = res.reviewingNum;
     toLearn.value = res.restNum;
-    learned.value = res.learnedNum;
+    learned.value = res.plan.finish;
     total.value = res.plan.count;
     if (process.value !== 0) percentage.value = process.value < 1 ? 1 : process.value;
   });

@@ -74,8 +74,8 @@
       <div class="btn-word">后一张</div>
     </div> -->
     </div>
-    <div v-show="showWordCard" class="word-card">
-      <word-card v-if="curWord" :word-info="curWord" />
+    <div v-show="showWordCard" class="word-card-wrap">
+      <div class="word-card-self"> <word-card v-if="curWord" :word-info="curWord" /></div>
       <div class="bnt-word-next">
         <n-button style="width: 265px" strong secondary round type="primary" @click="nextWordCard"
           >下一个</n-button
@@ -100,7 +100,7 @@
         <div class="end-header-title">Well&nbsp;Done !!!</div>
         <div style="margin-left: 16px"
           ><div>小主你真棒！</div>
-          <div style="margin-bottom: 16px">坚持学习了5分钟！</div>
+          <div style="margin-bottom: 16px">坚持学习了{{}}分钟！</div>
           <div style="margin-bottom: 16px"><span class="end-key">新词</span>15个</div>
           <div><span class="end-key">旧词</span>15个</div></div
         >
@@ -136,13 +136,14 @@
   let learnList: Array<Dic.LearnCardInfo> = [];
   let curWord = ref<Dic.WordInfo>();
   let showWordCard = ref(false);
-  let processStart = ref(0);
+  let processStart = ref(1);
   let dictId = ref(0);
   let processEnd = 0;
 
   let showEndModal = ref(false);
   const endModalStyle = ref({ width: '500px', borderRadius: '6px' });
   const TimeCountRef = ref<any>();
+  let timeSpan = ref(0);
 
   onMounted(async () => {
     const res = await api.dictionary.getTodayWordList();
@@ -150,8 +151,15 @@
     learnList = res.learn as Array<Dic.LearnCardInfo>;
     reviewWord.value = res.review ? res.review.length : 0;
     learnWord.value = res.learn ? res.learn.length : 0;
-    if (res.learn.length) {
-      curWord.value = res.learn[0].wordDto;
+    if (res.learn.length && !res.review) {
+      const tempFakeInfo = { word: res.learn[0].word, female: res.learn[0].voice };
+      const wordDto = res.learn[0].wordDto;
+      curWord.value = wordDto ? wordDto : tempFakeInfo;
+      dictId.value = res.learn[0].dictId;
+    } else {
+      const tempFakeInfo = { word: res.review[0].word, female: res.review[0].voice };
+      const wordDto = res.review[0].wordDto;
+      curWord.value = wordDto ? wordDto : tempFakeInfo;
       dictId.value = res.learn[0].dictId;
     }
     processEnd = reviewWord.value + learnWord.value;
@@ -222,35 +230,41 @@
 
   const nextWord = async () => {
     if (processStart.value < reviewWord.value) {
+      //复习旧词中
       if (reviewList?.length) {
-        let wordInfo = reviewList[++processStart.value];
+        let wordInfo = reviewList[processStart.value];
         let tempFakeInfo = { word: wordInfo.word, female: wordInfo.voice };
         curWord.value = wordInfo.wordDto ? wordInfo.wordDto : tempFakeInfo;
         reviewStart.value++;
       }
-    } else if (processStart.value === processEnd - 1) {
+    } else if (processStart.value === processEnd) {
+      // 学到最后一个单词了
       showEndModal.value = true;
       const timeObj = TimeCountRef.value?.end();
       let second = timeObj.second,
         min = timeObj.minute,
         hour = timeObj.hour;
-      let timeSpan = toDecimal(second / 60) + min + hour * 60;
-      console.log('timeSpan is', timeSpan);
+      timeSpan.value = toDecimal(second / 60) + min + hour * 60;
+      console.log('timeSpan is', timeSpan.value);
       let reviewed = reviewWord.value === 0 ? 0 : reviewList[reviewWord.value - 1].dictIndex;
       let learned = learnWord.value === 0 ? 0 : learnList[learnWord.value - 1].dictIndex;
-      await updateLearningRecord(dictId.value, reviewed, learned, timeSpan);
+      await updateLearningRecord(dictId.value, reviewed, learned, timeSpan.value);
     } else {
+      //复习完旧词了
+      if (processStart.value === reviewWord.value) reviewStart.value++;
+      // 学习新词中
       if (learnList?.length) {
-        let wordInfo = learnList[++processStart.value];
+        let wordInfo = learnList[processStart.value - reviewWord.value];
         let tempFakeInfo = { word: wordInfo.word, female: wordInfo.voice };
         curWord.value = wordInfo.wordDto ? wordInfo.wordDto : tempFakeInfo;
         learnStart.value++;
       }
     }
+    processStart.value++;
   };
 </script>
 
-<style lang="less">
+<style lang="less" scoped>
   .learning-word {
     display: flex;
     justify-content: center;
@@ -258,8 +272,8 @@
     align-items: center;
     .learning-card {
       margin: 0 36px;
-      width: 400px;
-      height: 560px;
+      width: 440px;
+      height: 600px;
       background: #ffffff;
       box-shadow: 0px 4px 4px 0px rgba(138, 138, 138, 0.25);
       border-radius: 4px;
@@ -289,7 +303,7 @@
       .card-btn {
         display: flex;
         justify-content: space-between;
-        margin-top: 60px;
+        margin-top: 90px;
         padding: 0 24px;
         .btn-pass {
           cursor: pointer;
@@ -386,11 +400,15 @@
         text-align: center;
       }
     }
-    .word-card {
+    .word-card-wrap {
       position: relative;
-      width: 400px;
+      width: 440px;
       background: #fff;
-      height: 560px;
+      height: 600px;
+      .word-card-self {
+        overflow-y: auto;
+        max-height: 525px;
+      }
       .bnt-word-next {
         text-align: center;
         position: absolute;

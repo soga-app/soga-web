@@ -43,7 +43,7 @@
 
   const end = () => {
     clearInterval(time);
-    return timeObj;
+    return timeObj.value;
   };
 
   defineExpose({

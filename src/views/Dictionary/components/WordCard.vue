@@ -119,13 +119,6 @@
   const emits = defineEmits(['searchWord']);
   const props = defineProps<Props>();
 
-  watch(
-    () => props.wordInfo,
-    (newVal: any, oldVal: any) => {
-      console.log('wordInfo changed ,xjm is', newVal.xjc, typeof newVal.xjc);
-    }
-  );
-
   // 关键词在例句中高亮
   function getHighlight(concent: string, keyword: string) {
     let replaceReg = new RegExp(keyword, 'g'); //正则
@@ -167,7 +160,7 @@
 <style lang="less" scoped>
   .wordcard {
     padding: 24px;
-    width: 100%;
+    // width: 100%;
     div[class^='word-layer-'] {
       display: flex;
       color: #8a8a8a;
