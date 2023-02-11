@@ -49,11 +49,12 @@
   import { ref, watch } from 'vue';
   import WordCard from './components/WordCard.vue';
   import api from '@/api';
-  import { useRoute } from 'vue-router';
   import { throttle } from '@/util';
+  import { useRoute, useRouter } from 'vue-router';
 
-  let wordInfo = ref();
   const route = useRoute();
+  const router = useRouter();
+  let wordInfo = ref();
   let wordRelatedOptions = ref();
   let wordRelatedList = ref();
   let searchWord = ref('');
@@ -64,7 +65,7 @@
   };
 
   watch(
-    () => route.query,
+    () => route.params,
     (newVal: any, oldVal: any) => {
       if (newVal?.word) {
         getWordInfo(newVal.word);
@@ -78,7 +79,6 @@
     if (val) {
       wordRelatedOptions.value = [];
       wordRelatedList.value = await api.dictionary.getRelatedWord(val);
-      console.log('related list is', wordRelatedList);
       wordRelatedList.value.forEach((i: any) => {
         const { word, meaning } = i;
         wordRelatedOptions.value.push({ label: { word, meaning }, key: word });
@@ -93,7 +93,8 @@
   function handelOptionChecked(checkedOption: string) {
     searchOptionShow.value = false;
     searchWord.value = checkedOption;
-    getWordInfo(checkedOption);
+    // getWordInfo(checkedOption);
+    router.push({ name: 'Dictionary', params: { word: checkedOption } });
   }
   function leave() {
     searchOptionShow.value = false;
@@ -104,7 +105,8 @@
   }
   async function handelSearchWord(word: string) {
     wordInfo.value = [];
-    getWordInfo(word);
+    // getWordInfo(word);
+    router.push({ name: 'Dictionary', params: { word } });
   }
 </script>
 

@@ -68,17 +68,15 @@
 
   function capitalizedFirstLetter(s: string) {
     let first = s[0];
-    console.log('return value is', first.toUpperCase() + s.slice(1));
     return first.toUpperCase() + s.slice(1);
   }
   function handleCardGo(path: string) {
     const pathName = capitalizedFirstLetter(path);
-    console.log('pathNmae is', pathName);
     goTo(pathName);
   }
 
-  function goTo(path: string, query?: any, param?: any) {
-    router.push({ name: path, query });
+  function goTo(path: string, params?: any) {
+    router.push({ name: path, params });
   }
 </script>
 

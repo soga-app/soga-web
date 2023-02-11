@@ -70,15 +70,25 @@
         <div class="word-key">双语例句</div>
         <div class="word-value">
           <div v-if="wordInfo.sentence && wordInfo.sentence.length" class="sent-list">
-            <div v-for="(item, index) in wordInfo.sentence" :key="index" class="sent-list-sentence">
+            <virtual-list-load
+              v-slot="slotProps"
+              :list-data="wordInfo.sentence"
+              :estimated-item-size="52"
+              height="400px"
+            >
               <div class="sent-info">
                 <div class="sent-info-left">
                   <div
                     class="sent-info-japan"
-                    v-html="getHighlight(`${index + 1}. ${item.Japanese}`, wordInfo.word)"
+                    v-html="
+                      getHighlight(
+                        `${slotProps.index + 1}. ${slotProps.item.Japanese}`,
+                        wordInfo.word
+                      )
+                    "
                   >
                   </div>
-                  <div class="sent-info-china">{{ item.Chinese }}</div>
+                  <div class="sent-info-china">{{ slotProps.item.Chinese }}</div>
                 </div>
                 <div class="sent-info-right">
                   <div class="sent-info-icon">
@@ -87,7 +97,7 @@
                       font-size="16px"
                       name="icon-copy"
                       class="icon-copy"
-                      @click="copy(`${item.Japanese}\n${item.Chinese}`)"
+                      @click="copy(`${slotProps.item.Japanese}\n${slotProps.item.Chinese}`)"
                     />
                     <svg-icon
                       color="#7f98d6"
@@ -98,7 +108,7 @@
                   </div>
                 </div>
               </div>
-            </div>
+            </virtual-list-load>
           </div>
           <span v-else class="empty-data">暂无数据</span>
         </div>
@@ -109,7 +119,6 @@
 
 <script lang="ts" setup>
   import { Dic } from '@/api/dictionary/index.d';
-  import { watch } from 'vue';
   import useClipboard from 'vue-clipboard3';
 
   interface Props {
@@ -185,6 +194,7 @@
       flex-shrink: 0;
     }
     .word-value {
+      width: 100%;
       display: inline-block;
       font-size: 14px;
       font-family: Noto Sans SC-Regular, Noto Sans SC;
@@ -204,37 +214,35 @@
           }
         }
       }
-      .sent-list {
-        &-sentence {
-          .sent-info {
-            margin-bottom: 16px;
-            display: flex;
-            &-left {
-              margin-right: 6px;
-              &:hover {
-                background-color: #5d80d016;
-              }
+    }
+    .sent-list {
+      .sent-info {
+        margin-bottom: 16px;
+        display: flex;
+        &-left {
+          margin-right: 6px;
+          &:hover {
+            background-color: #5d80d016;
+          }
+        }
+        &-japan {
+          font-weight: 600;
+        }
+        &-china {
+          margin-left: 18px;
+        }
+        &-icon {
+          flex-shrink: 0;
+          width: 36px;
+          .icon-copy {
+            cursor: pointer;
+            margin-right: 4px;
+            &:hover {
+              color: #587acb;
             }
-            &-japan {
-              font-weight: 600;
-            }
-            &-china {
-              margin-left: 18px;
-            }
-            &-icon {
-              flex-shrink: 0;
-              width: 36px;
-              .icon-copy {
-                cursor: pointer;
-                margin-right: 4px;
-                &:hover {
-                  color: #587acb;
-                }
-              }
-              .icon-favorite {
-                cursor: pointer;
-              }
-            }
+          }
+          .icon-favorite {
+            cursor: pointer;
           }
         }
       }
@@ -265,6 +273,12 @@
             cursor: pointer;
           }
         }
+      }
+    }
+    .word-layer-second {
+      .left,
+      .right {
+        display: flex;
       }
     }
     .empty-data {
