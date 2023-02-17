@@ -3,22 +3,45 @@
     <div class="home-content">
       <div class="home-left">
         <div class="home-left-up">
-          <div v-if="wordDaily" class="everyday-card">
-            <div class="card-up">
-              <div class="card-up-left">每日一记</div>
-              <div class="card-up-right" @click="goTo('Dictionary', { word: wordDaily.word })"
-                >点击跳转词典</div
-              >
-            </div>
-            <div class="card-down">
-              <div class="word">
-                <div class="word-text">{{ wordDaily.word }}</div>
-                <div class="word-audio">
-                  <svg-icon name="icon-laba" color="#fff" />
+          <div class="everyday-card">
+            <div v-if="wordDaily" class="everyday-card-inner">
+              <div class="card-up">
+                <div class="card-up-right" @click="goTo('Dictionary', { word: wordDaily.word })"
+                  >点击跳转词典</div
+                >
+              </div>
+              <div class="card-down">
+                <div class="word">
+                  <div class="word-text">
+                    <span style="font-weight: bold">单词：</span> {{ wordDaily.word }}
+                  </div>
+                  <div class="word-audio">
+                    <div class="word-audio-female">
+                      <svg-icon
+                        color="#e695bb"
+                        font-size="16px"
+                        name="icon-mic"
+                        @click="playAudio('female')"
+                      />
+                      <audio id="femaleAudio" :src="wordDaily?.female"></audio>
+                    </div>
+                    <div class="word-audio-male">
+                      <svg-icon
+                        color="#6483cf"
+                        font-size="16px"
+                        name="icon-mic"
+                        @click="playAudio('male')"
+                      />
+                      <audio id="maleAudio" :src="wordDaily?.male"></audio>
+                    </div>
+                  </div>
+                </div>
+                <div class="meaning">
+                  <span style="font-weight: bold">释义：</span> {{ wordDaily.meaning }}
                 </div>
               </div>
-              <div class="meaning">{{ wordDaily.meaning }} </div>
             </div>
+            <template v-else> <list-loading :row="1" :has-padding="true"></list-loading></template>
           </div>
         </div>
         <div class="home-left-down">
@@ -26,7 +49,7 @@
             <div
               v-for="(item, index) in utilityList"
               :key="index"
-              :style="{ marginRight: (index + 1) % 2 !== 0 ? '74px' : '0' }"
+              :style="{ marginRight: (index + 1) % 2 !== 0 ? '34px' : '0' }"
               :class="`utility-card card-bg-color-${item}`"
               @click="handleCardGo(item)"
             >
@@ -37,13 +60,49 @@
           </div>
         </div>
       </div>
-      <div class="home-right">
+      <div v-if="planRecordList && planRecordList.length" class="home-right">
         <div class="word-record">
           <div class="record-num">
-            <div class="record-num-title">打卡天数</div> <div class="record-num-info">15</div>
+            <div class="record-num-title">打卡天数</div>
+            <div class="record-num-info">{{ planRecordList.length }}</div>
           </div>
           <div class="calendar"><Calendar /> </div>
-          <div class="record-check-button">查看打卡记录</div>
+          <n-popover
+            placement="right-start"
+            trigger="click"
+            :content-style="{ padding: '16px 24px' }"
+          >
+            <template #trigger>
+              <div class="record-check-button" @click="timeLineModal = true">查看打卡记录</div>
+            </template>
+            <n-timeline size="medium">
+              <n-timeline-item
+                v-for="item in planRecordList"
+                :key="item.createTime"
+                type="info"
+                :time="item.createTime"
+                line-type="dashed"
+              >
+                <div class="record-info">
+                  <div class="record-info-text"
+                    ><div class="record-info-text-new"
+                      >新词学习：<span class="record-info-text-color">{{ item.learnedNum }}个</span>
+                    </div>
+                    <div class="record-info-text-old"
+                      >旧词复习：<span class="record-info-text-color"
+                        >{{ item.reviewedNum }}个</span
+                      >
+                    </div></div
+                  >
+                  <div class="record-info-text"
+                    >学习时长：<span class="record-info-text-color">{{
+                      `${item.learnTime} min`
+                    }}</span></div
+                  >
+                </div>
+              </n-timeline-item>
+            </n-timeline>
+          </n-popover>
         </div>
       </div>
     </div>
@@ -56,14 +115,23 @@
   import { UtilityMap } from './index';
   import { useRouter } from 'vue-router';
   import api from '@/api';
+  import { Dic } from '@/api/dictionary/index.d';
+
   const router = useRouter();
 
   let wordDaily = ref();
+  let planRecordList = ref<Array<Dic.PlanRecordItem>>();
+
+  let timeLineModal = ref(false);
 
   const utilityList = readonly(['translate', 'oraltrain', 'community', 'reciteword']);
 
   onMounted(async () => {
     wordDaily.value = await api.dictionary.getDailyWord();
+    planRecordList.value = await api.dictionary.getPlanRecordList();
+    const d = new Date();
+    let year = d.getFullYear();
+    let month = d.getMonth() + 1;
   });
 
   function capitalizedFirstLetter(s: string) {
@@ -77,6 +145,19 @@
 
   function goTo(path: string, params?: any) {
     router.push({ name: path, params });
+  }
+
+  function playAudio(type: 'female' | 'male') {
+    let audio: HTMLAudioElement;
+    switch (type) {
+      case 'female':
+        audio = document.getElementById('femaleAudio') as HTMLAudioElement;
+        break;
+      case 'male':
+        audio = document.getElementById('maleAudio') as HTMLAudioElement;
+        break;
+    }
+    audio.play();
   }
 </script>
 
@@ -97,7 +178,7 @@
     margin-left: 100px;
     .utility-card-text {
       position: relative;
-      left: 210px;
+      left: 168px;
       top: 75px;
     }
   }
@@ -127,7 +208,7 @@
     background-size: contain;
     .utility-card-text {
       position: relative;
-      left: 190px;
+      left: 160px;
       top: 20px;
     }
   }
@@ -141,31 +222,37 @@
     padding-top: 28px;
     justify-content: center;
     &-left {
-      width: 698px;
+      width: 550px;
       .everyday-card {
-        padding: 12px 16px 24px 34px;
-        background: rgba(88, 122, 203, 0.3);
         box-shadow: 0px 8px 40px 0px rgba(138, 138, 138, 0.2);
         border-radius: 4px;
         opacity: 1;
-        color: #fff;
+        background-color: #fff;
+        background: url('../../assets/img/everyday-card-bg.png') no-repeat;
+        background-size: cover;
+        height: 164px;
+        &-inner {
+          padding: 12px 16px 24px 34px;
+          color: #587acb;
+        }
         .card-up {
           display: flex;
-          justify-content: space-between;
-          &-left {
-            font-size: 16px;
-            font-weight: bold;
-            line-height: 33px;
-          }
+          justify-content: flex-end;
           &-right {
+            margin-bottom: 38px;
             font-size: 14px;
             font-weight: 400;
             line-height: 21px;
             cursor: pointer;
+            border: 1px solid #587acb;
+            line-height: 24px;
+            height: 24px;
+            border-radius: 4px;
+            padding: 1px 4px;
           }
         }
         .card-down {
-          margin-left: 52px;
+          margin-left: 26px;
           .word {
             display: flex;
             align-items: center;
@@ -177,11 +264,14 @@
             &-audio {
               margin-left: 8px;
               cursor: pointer;
+              display: flex;
+              &-female {
+                margin-right: 8px;
+              }
             }
           }
           .meaning {
             font-weight: 400;
-            color: #ffffff;
             line-height: 28px;
           }
         }
@@ -193,8 +283,8 @@
           flex-wrap: wrap;
           .utility-card {
             cursor: pointer;
-            width: 312px;
-            height: 219px;
+            width: 256px;
+            height: 180px;
             margin-bottom: 38px;
             border-radius: 10px 10px 10px 10px;
             box-shadow: 0px 4px 6px 0px rgba(138, 138, 138, 0.25);
@@ -203,8 +293,8 @@
               font-weight: bold;
               color: #707070;
               margin: 16px 18px;
-              width: 275px;
-              height: 189px;
+              width: 220px;
+              height: 144px;
               box-shadow: 0px 8px 20px 0px rgba(138, 138, 138, 0.2);
               border-radius: 6px 6px 6px 6px;
               opacity: 1;
@@ -225,7 +315,7 @@
     &-right {
       margin-left: 60px;
       .word-record {
-        height: 578px;
+        height: 538px;
         background: rgba(88, 122, 203, 0.1);
         box-shadow: 0px 4px 4px 0px rgba(143, 142, 142, 0.25);
         border-radius: 10px 10px 10px 10px;
@@ -276,6 +366,21 @@
           color: #6178b0;
           cursor: pointer;
         }
+      }
+    }
+  }
+  .record-info {
+    &-text {
+      color: #707070;
+      font-size: 12px;
+      display: flex;
+      margin-bottom: 8px;
+      &-color {
+        color: rgb(239, 194, 70);
+        font-weight: bold;
+      }
+      &-new {
+        margin-right: 16px;
       }
     }
   }

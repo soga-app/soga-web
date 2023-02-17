@@ -56,8 +56,8 @@
           <list-loading :row="1" :has-padding="true" />
         </template>
       </div>
-      <div class="card-btn" @click="passWordCard">
-        <div class="btn-pass"
+      <div class="card-btn">
+        <div class="btn-pass" @click="passWordCard"
           ><div class="inner">
             <img :src="passImg" alt="" style="width: 100%; height: 100%" />
             <img :src="passImgText" alt="" class="inner-text" /> </div
@@ -117,7 +117,7 @@
   import passImgText from '@/assets/img/dictionary/pass-text.png';
   import checkImgText from '@/assets/img/dictionary/check-text.png';
   import celebrateImg from '@/assets/img/dictionary/celebrate.png';
-  import { ref, onMounted } from 'vue';
+  import { ref, onMounted, nextTick } from 'vue';
   import { onBeforeRouteLeave, useRouter } from 'vue-router';
   import api from '@/api';
   import { Dic } from '@/api/dictionary/index.d';
@@ -139,6 +139,7 @@
   let processStart = ref(1);
   let dictId = ref(0);
   let processEnd = 0;
+  let firstAudioPlay = ref(true);
 
   let showEndModal = ref(false);
   const endModalStyle = ref({ width: '500px', borderRadius: '6px' });
@@ -168,7 +169,14 @@
       showEndModal.value = true;
       showWordCard.value = true;
     }
+    document.addEventListener('mousemove', () => {
+      if (firstAudioPlay.value) {
+        playAudio('male');
+        firstAudioPlay.value = false;
+      }
+    });
   });
+
   onBeforeRouteLeave((to, from) => {
     showModal.value = true;
     goToRoute.value = to.name as string;
@@ -192,6 +200,9 @@
       case 'male':
         audio = document.getElementById('maleAudio') as HTMLAudioElement;
         break;
+    }
+    if (audio.paused) {
+      audio.play(); //没有就播放
     }
     audio.play();
   }
@@ -245,7 +256,6 @@
         min = timeObj.minute,
         hour = timeObj.hour;
       timeSpan.value = toDecimal(second / 60) + min + hour * 60;
-      console.log('timeSpan is', timeSpan.value);
       let reviewed = reviewWord.value === 0 ? 0 : reviewList[reviewWord.value - 1].dictIndex;
       let learned = learnWord.value === 0 ? 0 : learnList[learnWord.value - 1].dictIndex;
       await updateLearningRecord(dictId.value, reviewed, learned, timeSpan.value);
@@ -260,6 +270,10 @@
         learnStart.value++;
       }
     }
+    nextTick(() => {
+      playAudio('male');
+    });
+
     processStart.value++;
   };
 </script>
@@ -287,7 +301,7 @@
         .review,
         .learn,
         .time {
-          width: 64px;
+          width: 70px;
           max-width: 120px;
           text-align: center;
           color: #587acb;

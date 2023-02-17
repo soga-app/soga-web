@@ -22,5 +22,12 @@ export default {
   // 今日背单词列表
   getTodayWordList: (): Promise<Dic.TodayWordList> => http.get('/api/plan/wordList'),
   // 更新用户单词记录
-  updateLearningRecord: (data: Dic.LearningRecordParam) => http.put('/api/PlanRecord', data)
+  updateLearningRecord: (data: Dic.LearningRecordParam) => http.put('/api/PlanRecord', data),
+  // 打卡记录列表
+  getPlanRecordList: (): Promise<Array<Dic.PlanRecordItem>> => http.get('/api/PlanRecord/list'),
+  // 根据日期获取打卡记录
+  getPlanRecordByCalendar: (params: {
+    year: number;
+    month: number;
+  }): Promise<Array<Dic.PlanRecordCalendarItem>> => http.get('/api/PlanRecord/Calendar', params)
 };

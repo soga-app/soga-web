@@ -88,7 +88,6 @@
       top: index * props.estimatedItemSize,
       bottom: (index + 1) * props.estimatedItemSize
     }));
-    console.log('执行initPositions', positions);
   }
   //获取列表起始索引
   function getStartIndex(scrollTop = 0) {
@@ -170,13 +169,11 @@
 
   onMounted(() => {
     screenHeight.value = (list.value as HTMLElement).clientHeight;
-    console.log('screenHeight', screenHeight.value);
     start.value = 0;
     end.value = start.value + visibleCount.value;
   });
 
   onUpdated(() => {
-    console.log('update');
     nextTick(() => {
       if (!items.value) {
         return;

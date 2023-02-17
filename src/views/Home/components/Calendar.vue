@@ -42,8 +42,8 @@
             <div v-show="item.isHighlight && item.isOver" class="day-item-pop tip-pop">
               <div class="tip-pop-content">
                 <div class="word-progress">
-                  <div class="word-new">新词：15</div>
-                  <div class="word-old">旧词：20</div>
+                  <div class="word-new">新词：{{ item.hightLightInfo.learnedNum }}</div>
+                  <div class="word-old">旧词：{{ item.hightLightInfo.reviewedNum }}</div>
                 </div>
               </div>
             </div>
@@ -56,6 +56,10 @@
 
 <script lang="ts" setup>
   import { reactive, onMounted, watch, computed } from 'vue';
+  import api from '@/api';
+  import { ref } from 'vue';
+  import { Dic } from '@/api/dictionary/index.d';
+
   const weeks = ['日', '一', '二', '三', '四', '五', '六'];
   interface dayItem {
     date: number;
@@ -64,10 +68,14 @@
     isHighlight: boolean;
     [propName: string]: any;
   }
+
+  let hightLightDates: Array<number> = [];
   let days: Array<dayItem> = reactive([]);
   const curDate = reactive({ year: 0, month: 0, day: 0 }); //month 月份 0~11 ，day 星期 0~6
   const alterDate = reactive({ year: 0, month: 0, day: 0 });
   const monthOption: Array<{ label: number; value: number }> = [];
+  let recordInfo = ref<Array<Dic.PlanRecordCalendarItem>>();
+
   for (let i = 1; i <= 12; i++) {
     monthOption.push({ label: i, value: i });
   }
@@ -99,7 +107,7 @@
     days[index].isOver = false;
   }
 
-  onMounted(() => {
+  onMounted(async () => {
     const d = new Date();
     curDate.year = d.getFullYear();
     curDate.month = d.getMonth();
@@ -107,6 +115,11 @@
     alterDate.year = d.getFullYear();
     alterDate.month = d.getMonth();
     alterDate.day = d.getDate();
+    const { year, month } = curDate;
+    recordInfo.value = await api.dictionary.getPlanRecordByCalendar({ year, month: month + 1 });
+    recordInfo.value.forEach((item: any) => {
+      hightLightDates.push(item.dayN);
+    });
     setDays(curDate.year, curDate.month);
   });
 
@@ -172,16 +185,35 @@
       } else {
         isThisMonth = 1;
       }
-      days.push({ date: d.getDate(), isCurDay, isThisMonth, isHighlight: false, isOver: false });
+      days.push({
+        date: d.getDate(),
+        isCurDay,
+        month: d.getMonth(),
+        year: d.getFullYear(),
+        isThisMonth,
+        isHighlight: false,
+        isOver: false,
+        hightLightInfo: {}
+      });
     }
-    //测试demo
-    days[11].isHighlight = true;
-    days[12].isHighlight = true;
-    days[13].isHighlight = true;
-    days[15].isHighlight = true;
-    days[29].isHighlight = true;
-    days[20].isHighlight = true;
-    days[33].isHighlight = true;
+    const curd = new Date();
+    // 设置高亮部分
+    for (let i = 0; i < 42; i++) {
+      let index = hightLightDates.indexOf(days[i].date);
+      if (
+        index != -1 &&
+        days[i].isThisMonth === 1 &&
+        days[i].month === curd.getMonth() &&
+        days[i].year === curd.getFullYear()
+      ) {
+        days[i].isHighlight = true;
+        if (recordInfo.value) {
+          let info = recordInfo.value[index];
+          let { learnedNum, reviewedNum } = info;
+          days[i].hightLightInfo = { learnedNum, reviewedNum };
+        }
+      }
+    }
   }
 
   function getFullDayOfMonth(year: number, month: number) {

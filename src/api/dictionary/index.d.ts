@@ -73,4 +73,16 @@ export namespace Dic {
     learned: number;
     reviewed: number;
   }
+  interface PlanRecordItem {
+    createTime: string;
+    learnedNum: number;
+    reviewedNum: number;
+    learnTime: number;
+  }
+  interface PlanRecordCalendarItem {
+    dayN: number;
+    learnedNum: number;
+    reviewedNum: number;
+    learnTime: number;
+  }
 }

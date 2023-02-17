@@ -2,7 +2,11 @@
   <div v-if="!hideNav" class="nav nav_wrapper">
     <div class="nav-left">
       <div class="nav-left-logo" @click="goTo('homePage')"
-        ><img src="../assets/logo1.png" alt="" style="width: 112px; height: 40px" />
+        ><img
+          src="../assets/logo1.png"
+          alt=""
+          style="width: 112px; height: 40px; margin-top: 6px"
+        />
       </div>
     </div>
     <div class="nav-right">
@@ -16,7 +20,7 @@
               <img
                 :src="userStore.getGender === '男' ? boyImg : girlImg"
                 alt=""
-                style="width: 48px; height: 48px"
+                style="width: 48px; height: 48px; margin-top: 6px"
               />
             </n-dropdown>
           </div>
@@ -85,7 +89,7 @@
 <style scoped lang="less">
   .nav_wrapper {
     padding: 0 100px 0 100px;
-    height: 53px;
+    height: 54px;
     background: #587acb;
     box-shadow: 0px 4px 4px 0px rgba(138, 138, 138, 0.25);
     border-radius: 0px 0px 0px 0px;
