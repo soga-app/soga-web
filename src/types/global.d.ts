@@ -7,6 +7,9 @@ declare global {
     $message: MessageApiInjection;
     $dialog: DialogApiInjection;
   }
+  interface InfoMap {
+    [key: string]: string;
+  }
 }
 
 declare type Nullable<T> = T | null;

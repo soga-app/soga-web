@@ -1,7 +1,3 @@
-interface InfoMap {
-  [key: string]: string;
-}
-
 //功能卡片Map
 export const UtilityMap: InfoMap = {
   translate: '翻译',

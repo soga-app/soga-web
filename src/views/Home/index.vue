@@ -41,7 +41,7 @@
                 </div>
               </div>
             </div>
-            <template v-else> <list-loading :row="1" :has-padding="true"></list-loading></template>
+            <template v-else> <list-loading :row="1"></list-loading></template>
           </div>
         </div>
         <div class="home-left-down">

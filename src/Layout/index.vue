@@ -27,6 +27,7 @@
         </div>
         <div class="nav-right-option" @click="goTo('userCenter')">个人中心</div>
         <div class="nav-right-option">足迹</div>
+        <!-- <book-mark-drop-down><div class="nav-right-option">足迹</div></book-mark-drop-down> -->
       </n-space>
     </div>
   </div>
@@ -109,9 +110,10 @@
     &-right {
       display: flex;
       &-option {
+        height: 54px;
         font-size: 16px;
         font-weight: bold;
-        line-height: 21px;
+        line-height: 54px;
         cursor: pointer;
       }
     }

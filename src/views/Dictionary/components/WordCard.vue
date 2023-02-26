@@ -104,6 +104,7 @@
                       font-size="16px"
                       name="icon-favorite"
                       class="icon-favorite"
+                      @click="showBookMarkModal = true"
                     />
                   </div>
                 </div>
@@ -114,12 +115,18 @@
         </div>
       </div>
     </div>
+    <book-mark-modal
+      :show-book-mark-modal="showBookMarkModal"
+      :favorite-list="favoriteList"
+      @updateBookMarkModal="showBookMarkModal = false"
+    ></book-mark-modal>
   </div>
 </template>
 
 <script lang="ts" setup>
   import { Dic } from '@/api/dictionary/index.d';
   import useClipboard from 'vue-clipboard3';
+  import { ref } from 'vue';
 
   interface Props {
     wordInfo: Dic.WordInfo;
@@ -127,6 +134,13 @@
 
   const emits = defineEmits(['searchWord']);
   const props = defineProps<Props>();
+  let showBookMarkModal = ref(false);
+  let favoriteList = ref([
+    { name: '日常对话' },
+    { name: '问路' },
+    { name: '厌恶' },
+    { name: '喜好' }
+  ]);
 
   // 关键词在例句中高亮
   function getHighlight(concent: string, keyword: string) {

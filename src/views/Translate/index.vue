@@ -2,26 +2,31 @@
   <div class="body-wrap">
     <div class="translate-wrap">
       <div class="header">
-        <div>{{ transFromLang }}</div>
+        <div>{{ TransLangMap[transFromLang] }}</div>
         <div class="reverse-icon" @click="reverseLang">
-          <svg-icon name="icon-zhihuan" color="#587acb" font-size="16px" />
+          <svg-icon name="icon-zhihuan" color="#888" font-size="18px" hover-color="#587acb" />
         </div>
-        <div>{{ transToLang }}</div>
+        <div>{{ TransLangMap[transToLang] }}</div>
         <div class="btn-trans">
-          <n-button strong secondary size="small" type="info">翻译</n-button>
+          <n-button strong secondary size="small" type="info" @click="handleTrans">翻译</n-button>
+        </div>
+        <div class="trans-history">
+          <svg-icon name="icon-time" />
+          <span class="trans-history-text">翻译历史</span>
         </div>
       </div>
       <div class="content">
         <div class="content-main">
           <div class="trans-from"
             ><n-input
+              v-model:value="transText"
               type="textarea"
               placeholder="请输入需要翻译的文本"
               :autosize="{ minRows: 21, maxRows: 21 }"
             />
           </div>
           <div class="delimiter"></div>
-          <div class="trans-to"></div
+          <div class="trans-to" v-html="transResult"></div
         ></div>
         <div class="content-footer">
           <svg-icon
@@ -30,6 +35,7 @@
             color="#888"
             hover-color="#587acb"
             :cursor-to-pointer="true"
+            @click="handleClear"
           />
         </div>
       </div>
@@ -39,14 +45,33 @@
 
 <script lang="ts" setup>
   import { ref } from 'vue';
+  import { TransLangMap } from './index';
+  import api from '@/api';
 
-  let transFromLang = ref('汉语');
-  let transToLang = ref('日语');
+  let transFromLang = ref('zh');
+  let transToLang = ref('jp');
+  let transText = ref('');
+  let transResult = ref('');
 
   const reverseLang = () => {
     let temp = transFromLang.value;
     transFromLang.value = transToLang.value;
     transToLang.value = temp;
+  };
+
+  const handleTrans = async () => {
+    const { trans_result } = await api.translation.translate({
+      from: transFromLang.value,
+      to: transToLang.value,
+      query: transText.value
+    });
+    transResult.value = trans_result.reduce((pre, next) => pre + next.dst + '<br/>', '');
+    console.log('transResult', transResult.value);
+  };
+
+  const handleClear = () => {
+    transText.value = '';
+    transResult.value = '';
   };
 </script>
 
@@ -69,6 +94,8 @@
         font-size: 16px;
         display: flex;
         border-bottom: 1px solid #eee;
+        align-items: center;
+        position: relative;
         .reverse-icon {
           display: inline-block;
           margin: 0 24px;
@@ -76,6 +103,26 @@
         }
         .btn-trans {
           margin-left: 40px;
+        }
+        .trans-history {
+          position: absolute;
+          right: 12px;
+          display: flex;
+          align-items: center;
+          padding: 0 8px;
+          height: 36px;
+          // background: #e2e7fab1;
+          border-radius: 10px;
+          color: #666;
+          margin-left: 20px;
+          cursor: pointer;
+          &:hover {
+            color: #587acb;
+          }
+          &-text {
+            margin-left: 4px;
+            display: inline-block;
+          }
         }
       }
       .content {
