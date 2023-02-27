@@ -83,49 +83,34 @@
       </div>
     </div>
   </div>
-  <n-modal
-    v-model:show="showModal"
-    preset="dialog"
-    title="确认"
-    content="小主你的单词还没学习/复习完，你确定要离开吗?"
-    positive-text="确认"
-    negative-text="取消"
-    @positive-click="endLearning"
-    @negative-click="showModal = false"
+  <LeaveModal
+    :show-leave-modal="showLeaveModal"
+    @end-learning="endLearning"
+    @updateLeaveModal="showLeaveModal = false"
   />
-  <n-modal v-model:show="showEndModal" :style="endModalStyle" :mask-closable="false">
-    <div class="end-content">
-      <div class="end-content-left"> <img :src="celebrateImg" class="end-content-left-img" /></div>
-      <div class="end-content-right">
-        <div class="end-header-title">Well&nbsp;Done !!!</div>
-        <div style="margin-left: 16px"
-          ><div>小主你真棒！</div>
-          <div style="margin-bottom: 16px">坚持学习了{{}}分钟！</div>
-          <div style="margin-bottom: 16px"><span class="end-key">新词</span>15个</div>
-          <div><span class="end-key">旧词</span>15个</div></div
-        >
-        <div class="end-content-right-btn">
-          <n-button secondary round strong type="primary" @click="leaveLearning">完成打卡</n-button>
-        </div>
-      </div>
-    </div>
-  </n-modal>
+  <EndModal
+    :show-end-modal="showEndModal"
+    :learn-time="timeSpan"
+    @leave-learning="leaveLearning"
+    @update-end-modal="showEndModal = false"
+  />
 </template>
 <script setup lang="ts">
   import passImg from '@/assets/img/dictionary/pass.png';
   import checkImg from '@/assets/img/dictionary/check.png';
   import passImgText from '@/assets/img/dictionary/pass-text.png';
   import checkImgText from '@/assets/img/dictionary/check-text.png';
-  import celebrateImg from '@/assets/img/dictionary/celebrate.png';
-  import { ref, onMounted, nextTick } from 'vue';
+  import { ref, onMounted, nextTick, onActivated } from 'vue';
   import { onBeforeRouteLeave, useRouter } from 'vue-router';
   import api from '@/api';
   import { Dic } from '@/api/dictionary/index.d';
   import WordCard from './components/WordCard.vue';
+  import LeaveModal from './components/LeaveModal.vue';
+  import EndModal from './components/EndModal.vue';
   import { toDecimal } from '@/util';
 
   const router = useRouter();
-  let showModal = ref(false);
+  let showLeaveModal = ref(false);
   let goToRoute = ref('');
   let reviewWord = ref(0);
   let reviewStart = ref(0);
@@ -140,11 +125,27 @@
   let dictId = ref(0);
   let processEnd = 0;
   let firstAudioPlay = ref(true);
+  let planFinished = ref(false);
 
   let showEndModal = ref(false);
-  const endModalStyle = ref({ width: '500px', borderRadius: '6px' });
   const TimeCountRef = ref<any>();
   let timeSpan = ref(0);
+
+  onActivated(async () => {
+    const res = await api.dictionary.getTodayWordList();
+    reviewWord.value = res.review ? res.review.length : 0;
+    learnWord.value = res.learn ? res.learn.length : 0;
+    if (!reviewWord.value && !learnWord.value) {
+      // 表示单词学习且复习完了
+      window.$message.info('今日单词学习计划已经完成！');
+      isLeave.value = true;
+      planFinished.value = true;
+      router.push({ name: 'HomePage' });
+      return;
+    }
+    isLeave.value = false;
+    TimeCountRef.value.start();
+  });
 
   onMounted(async () => {
     const res = await api.dictionary.getTodayWordList();
@@ -152,12 +153,15 @@
     learnList = res.learn as Array<Dic.LearnCardInfo>;
     reviewWord.value = res.review ? res.review.length : 0;
     learnWord.value = res.learn ? res.learn.length : 0;
-    if (res.learn.length && !res.review) {
+    if (!reviewWord.value && !learnWord.value) return;
+    if (learnWord.value && !reviewWord.value) {
+      //表示计划的最开始，只有学习单词的情况
       const tempFakeInfo = { word: res.learn[0].word, female: res.learn[0].voice };
       const wordDto = res.learn[0].wordDto;
       curWord.value = wordDto ? wordDto : tempFakeInfo;
       dictId.value = res.learn[0].dictId;
-    } else {
+    } else if (!learnWord.value && reviewWord.value) {
+      //表示计划的最终，只有复习单词的情况
       const tempFakeInfo = { word: res.review[0].word, female: res.review[0].voice };
       const wordDto = res.review[0].wordDto;
       curWord.value = wordDto ? wordDto : tempFakeInfo;
@@ -178,7 +182,7 @@
   });
 
   onBeforeRouteLeave((to, from) => {
-    showModal.value = true;
+    if (!planFinished.value) showLeaveModal.value = true;
     goToRoute.value = to.name as string;
     if (!isLeave.value) return false;
     else return true;
@@ -186,8 +190,9 @@
 
   const endLearning = (path?: string) => {
     if (path) goToRoute.value = path;
-    showModal.value = false;
+    showLeaveModal.value = false;
     isLeave.value = true;
+    TimeCountRef.value?.end();
     router.push({ name: goToRoute.value });
   };
 
@@ -200,9 +205,6 @@
       case 'male':
         audio = document.getElementById('maleAudio') as HTMLAudioElement;
         break;
-    }
-    if (audio.paused) {
-      audio.play(); //没有就播放
     }
     audio.play();
   }
@@ -428,48 +430,6 @@
         position: absolute;
         bottom: 24px;
         width: 100%;
-      }
-    }
-  }
-  .end-content {
-    display: flex;
-    width: 100%;
-    padding: 16px 24px;
-    background: #fff;
-    background-image: url('@/assets/img/dictionary/string.png');
-    background-size: 28% 50%;
-    background-position: right top;
-    background-repeat: no-repeat;
-    &-left {
-      width: 97px;
-      position: relative;
-      &-img {
-        width: 100%;
-        height: 95px;
-        position: absolute;
-        bottom: 10px;
-      }
-    }
-    &-right {
-      margin-left: 20px;
-      margin-top: 32px;
-      .end-header-title {
-        color: #7e9ff1;
-        font-size: 28px;
-        font-weight: bold;
-      }
-      .end-key {
-        display: inline-block;
-        margin-right: 8px;
-        color: #fff;
-        padding: 1px 8px;
-        background: #a9bced;
-        border-radius: 12px;
-      }
-      &-btn {
-        width: 282px;
-        margin-top: 24px;
-        text-align: center;
       }
     }
   }

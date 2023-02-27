@@ -7,6 +7,7 @@ export default [
   {
     path: 'reciteword',
     name: 'Reciteword',
+    meta: { keepAlive: true },
     beforeEnter: (to: any, from: any, next: any) => {
       const userState = window.localStorage.getItem('UserState');
       if (userState) {

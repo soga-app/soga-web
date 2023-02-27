@@ -31,7 +31,14 @@
       </n-space>
     </div>
   </div>
-  <div class="content-wrapper"><router-view></router-view> </div>
+  <div class="content-wrapper">
+    <router-view v-slot="{ Component }">
+      <keep-alive>
+        <component :is="Component" v-if="$route.meta.keepAlive" />
+      </keep-alive>
+      <component :is="Component" v-if="!$route.meta.keepAlive" />
+    </router-view>
+  </div>
 </template>
 <script lang="ts" setup>
   import api from '@/api';

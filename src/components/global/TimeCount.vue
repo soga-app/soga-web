@@ -3,6 +3,7 @@
     默认显示从某一个时刻开始的 小时：分钟 ：秒 的流逝
     提供一个数组显示需要展示的信息 ['hour','minute','second'] ,默认展示全部
     每次时间改变通过 function timeChange(timeObj) 获得当前时间
+    提供 end 停止计时，start 继续计时
     可通过默认插槽来改变默认显示样式,提供插槽props 名为 timeObj -->
   <div
     ><div v-if="!$slots.default">
@@ -21,11 +22,6 @@
 
   let time = null as any;
   let timeObj = ref({ hour: 0, minute: 0, second: 0 });
-
-  onMounted(() => {
-    start();
-  });
-
   const start = () => {
     time = setInterval(() => {
       timeObj.value.second++;
@@ -47,6 +43,7 @@
   };
 
   defineExpose({
+    start,
     end
   });
 </script>

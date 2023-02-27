@@ -66,7 +66,6 @@
       query: transText.value
     });
     transResult.value = trans_result.reduce((pre, next) => pre + next.dst + '<br/>', '');
-    console.log('transResult', transResult.value);
   };
 
   const handleClear = () => {
