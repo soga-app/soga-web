@@ -10,7 +10,7 @@
         <div class="btn-trans">
           <n-button strong secondary size="small" type="info" @click="handleTrans">翻译</n-button>
         </div>
-        <div class="trans-history">
+        <div class="trans-history" @click="getTransHistory">
           <svg-icon name="icon-time" />
           <span class="trans-history-text">翻译历史</span>
         </div>
@@ -40,6 +40,32 @@
         </div>
       </div>
     </div>
+    <div v-if="transHistoryShow" class="translate-history">
+      <div class="close-btn">
+        <svg-icon name="icon-guanbi" font-size="14px" @click="transHistoryShow = false" />
+      </div>
+      <div
+        v-for="(item, index) in transHistoryList"
+        :key="item.createTime"
+        class="history-item"
+        @click="showHistory(index)"
+      >
+        <div class="history-item-up"
+          ><div class="history-item-up-content">
+            {{ item.content }}
+          </div></div
+        >
+        <div class="history-item-down">
+          <div class="history-item-down-left"
+            >{{ TransLangMap[item.fromLanguage] }} <span>转</span>
+            {{ TransLangMap[item.toLanguage] }}</div
+          >
+          <div class="history-item-down-right">
+            {{ item.createTime }}
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -47,11 +73,14 @@
   import { ref } from 'vue';
   import { TransLangMap } from './index';
   import api from '@/api';
+  import { Trans } from '@/api/translation/index.d';
 
   let transFromLang = ref('zh');
   let transToLang = ref('jp');
   let transText = ref('');
   let transResult = ref('');
+  let transHistoryShow = ref(false);
+  let transHistoryList = ref<Array<Trans.TransHistoryItem>>();
 
   const reverseLang = () => {
     let temp = transFromLang.value;
@@ -72,6 +101,18 @@
     transText.value = '';
     transResult.value = '';
   };
+
+  const getTransHistory = async () => {
+    transHistoryShow.value = true;
+    transHistoryList.value = await api.translation.translateHistory();
+  };
+
+  const showHistory = (index: number) => {
+    if (transHistoryList.value) {
+      transText.value = transHistoryList.value[index].content;
+      transResult.value = transHistoryList.value[index].result;
+    }
+  };
 </script>
 
 <style lang="less" scoped>
@@ -81,7 +122,7 @@
     padding-top: 24px;
     .translate-wrap {
       color: #666;
-      width: 900px;
+      width: 800px;
       height: 600px;
       background: #fff;
       border-radius: 5px;
@@ -135,17 +176,61 @@
             background: #ddd;
           }
           .trans-from {
-            width: 400px;
+            width: 360px;
             height: 460px;
             margin-right: 16px;
           }
           .trans-to {
+            width: 360px;
             margin-left: 16px;
           }
         }
         &-footer {
           padding-left: 16px;
         }
+      }
+    }
+    .translate-history {
+      background: #fff;
+      padding: 18px;
+      margin-left: 24px;
+      width: 300px;
+      height: 564px;
+      overflow-y: auto;
+    }
+    .close-btn {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 4px;
+    }
+    .history-item {
+      margin-bottom: 20px;
+      padding: 6px;
+      cursor: pointer;
+      &:hover {
+        background: #f0f0d76e;
+      }
+      &-up {
+        background: #f2f3fa;
+        border-radius: 10px;
+        color: #666;
+        margin-bottom: 4px;
+        padding: 8px;
+        &-content {
+          line-height: 24px;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          display: -webkit-box;
+          -webkit-box-orient: vertical;
+          -webkit-line-clamp: 5;
+          max-width: 288px;
+        }
+      }
+      &-down {
+        display: flex;
+        justify-content: space-between;
+        color: #555;
+        font-size: 12px;
       }
     }
   }

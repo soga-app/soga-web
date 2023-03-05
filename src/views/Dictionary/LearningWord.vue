@@ -40,7 +40,7 @@
                 name="icon-mic"
                 @click="playAudio('female')"
               />
-              <audio id="femaleAudio" :src="curWord?.female"></audio>
+              <audio id="femaleAudio" :src="curWord?.female" preload="auto"></audio>
             </div>
             <div class="wordInfo-audio-male">
               <svg-icon
@@ -49,7 +49,7 @@
                 name="icon-mic"
                 @click="playAudio('male')"
               />
-              <audio id="maleAudio" :src="curWord?.male"></audio>
+              <audio id="maleAudio" :src="curWord?.male" preload="auto"></audio>
             </div> </div
         ></div>
         <template v-else>
@@ -94,6 +94,16 @@
     @leave-learning="leaveLearning"
     @update-end-modal="showEndModal = false"
   />
+  <n-modal
+    v-model:show="showPlayAudioModal"
+    :mask-closable="false"
+    preset="dialog"
+    title="确认"
+    content="你确认"
+    positive-text="确认"
+    @positive-click="onPositiveClick"
+  />
+  <button id="test" style="display: none"> </button>
 </template>
 <script setup lang="ts">
   import passImg from '@/assets/img/dictionary/pass.png';
@@ -130,6 +140,11 @@
   let showEndModal = ref(false);
   const TimeCountRef = ref<any>();
   let timeSpan = ref(0);
+  let showPlayAudioModal = ref(false);
+
+  const onPositiveClick = () => {
+    playAudio('male');
+  };
 
   onActivated(async () => {
     const res = await api.dictionary.getTodayWordList();
@@ -160,7 +175,7 @@
       const wordDto = res.learn[0].wordDto;
       curWord.value = wordDto ? wordDto : tempFakeInfo;
       dictId.value = res.learn[0].dictId;
-    } else if (!learnWord.value && reviewWord.value) {
+    } else {
       //表示计划的最终，只有复习单词的情况
       const tempFakeInfo = { word: res.review[0].word, female: res.review[0].voice };
       const wordDto = res.review[0].wordDto;
@@ -173,12 +188,15 @@
       showEndModal.value = true;
       showWordCard.value = true;
     }
-    document.addEventListener('mousemove', () => {
-      if (firstAudioPlay.value) {
-        playAudio('male');
-        firstAudioPlay.value = false;
-      }
-    });
+    showPlayAudioModal.value = true;
+    // document.addEventListener('mousemove', () => {
+    //   if (firstAudioPlay.value) {
+    //     // const btn = document.getElementById('test');
+    //     // btn?.click();
+    //     playAudio('male');
+    //     firstAudioPlay.value = false;
+    //   }
+    // });
   });
 
   onBeforeRouteLeave((to, from) => {
@@ -207,6 +225,7 @@
         break;
     }
     audio.play();
+    console.log('调用了playAudio');
   }
 
   const checkWordCard = () => {

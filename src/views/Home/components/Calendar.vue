@@ -69,7 +69,7 @@
     [propName: string]: any;
   }
 
-  let hightLightDates: Array<number> = [];
+  let hightLightDates: Array<number> = reactive([]);
   let days: Array<dayItem> = reactive([]);
   const curDate = reactive({ year: 0, month: 0, day: 0 }); //month 月份 0~11 ，day 星期 0~6
   const alterDate = reactive({ year: 0, month: 0, day: 0 });
@@ -80,7 +80,17 @@
     monthOption.push({ label: i, value: i });
   }
 
-  watch(alterDate, (newVal) => {
+  watch(alterDate, async (newVal) => {
+    console.log('watch');
+    // setHightLightDate(alterDate.year, alterDate.month);
+    recordInfo.value = await api.dictionary.getPlanRecordByCalendar({
+      year: alterDate.year,
+      month: alterDate.month + 1
+    });
+    hightLightDates = [];
+    recordInfo.value.forEach((item: any) => {
+      hightLightDates.push(item.dayN);
+    });
     setDays(newVal.year, newVal.month);
     const curFullDays = getFullDayOfMonth(newVal.year, newVal.month + 1);
     if (curFullDays < alterDate.day) {
@@ -115,13 +125,22 @@
     alterDate.year = d.getFullYear();
     alterDate.month = d.getMonth();
     alterDate.day = d.getDate();
-    const { year, month } = curDate;
+  });
+
+  const setHightLightDate = async (year: number, month: number) => {
+    console.log('执行setHightLightDate', year, month);
     recordInfo.value = await api.dictionary.getPlanRecordByCalendar({ year, month: month + 1 });
+    hightLightDates = [];
     recordInfo.value.forEach((item: any) => {
       hightLightDates.push(item.dayN);
     });
-    setDays(curDate.year, curDate.month);
-  });
+    console.log(
+      '执行完setHighLightDate recordInfo is',
+      recordInfo.value,
+      'hightLightDates is',
+      hightLightDates
+    );
+  };
 
   function updateYear(val: number) {
     alterDate.year = val;
@@ -158,6 +177,7 @@
   }
 
   function setDays(year: number, month: number) {
+    console.log('执行setDays', year, month);
     days.length = 0;
     const d = new Date();
     d.setFullYear(year);
@@ -196,24 +216,34 @@
         hightLightInfo: {}
       });
     }
-    const curd = new Date();
     // 设置高亮部分
+    // debugger;
+    console.log(
+      'in setDays hightLightDates is',
+      hightLightDates,
+      'recordInfo is',
+      recordInfo.value
+    );
     for (let i = 0; i < 42; i++) {
       let index = hightLightDates.indexOf(days[i].date);
       if (
         index != -1 &&
         days[i].isThisMonth === 1 &&
-        days[i].month === curd.getMonth() &&
-        days[i].year === curd.getFullYear()
+        days[i].month === alterDate.month &&
+        days[i].year === alterDate.year
       ) {
+        console.log('index is', index, 'yes');
         days[i].isHighlight = true;
         if (recordInfo.value) {
           let info = recordInfo.value[index];
           let { learnedNum, reviewedNum } = info;
           days[i].hightLightInfo = { learnedNum, reviewedNum };
         }
+      } else {
+        console.log('index is', index, 'no');
       }
     }
+    console.log('执行完setDays');
   }
 
   function getFullDayOfMonth(year: number, month: number) {
