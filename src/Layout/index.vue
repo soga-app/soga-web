@@ -26,8 +26,21 @@
           </div>
         </div>
         <div class="nav-right-option" @click="goTo('userCenter')">个人中心</div>
-        <div class="nav-right-option">足迹</div>
-        <!-- <book-mark-drop-down><div class="nav-right-option">足迹</div></book-mark-drop-down> -->
+        <!-- <div class="nav-right-option">足迹</div> -->
+        <book-mark-drop-down :options="bookMarkOptions">
+          <template #trigger>
+            <div class="nav-right-option">足迹</div>
+          </template>
+          <template #child="{ option }">
+            <div class="child-option">
+              <div class="child-option-left">{{ option.info.type }}</div>
+              <div class="child-option-right">
+                <div class="child-option-right-up">{{ option.info.japan }}</div>
+                <div class="child-option-right-down">{{ option.info.chinese }}</div>
+              </div>
+            </div>
+          </template>
+        </book-mark-drop-down>
       </n-space>
     </div>
   </div>
@@ -46,7 +59,7 @@
   import boyImg from '@/assets/img/user/boy.png';
   import { UserStore } from '@/stores';
   import { useRoute, useRouter } from 'vue-router';
-  import { computed } from 'vue';
+  import { computed, reactive } from 'vue';
   const route = useRoute();
   const router = useRouter();
   const userStore = UserStore();
@@ -67,6 +80,116 @@
       key: 'changePassword'
     }
   ];
+  let bookMarkOptions = reactive([
+    {
+      label: '收藏夹1',
+      value: '001',
+      child: [
+        {
+          label: '文章1',
+          value: 'passage1',
+          info: {
+            type: '单词',
+            chinese: '短时间内官方SDK交给你',
+            japan: '彼は逃げるためにありとあらゆる手段を捜した。'
+          }
+        },
+        {
+          label: '文章2',
+          value: 'passage1',
+          info: {
+            type: '单词',
+            chinese: '短时间内官方SDK交给你',
+            japan: '彼は逃げるためにありとあらゆる手段を捜した。'
+          }
+        }
+      ]
+    },
+    {
+      label: '收藏夹2',
+      value: '002',
+      child: [
+        {
+          label: '文章4',
+          value: 'passage1',
+          info: {
+            type: '单词',
+            chinese: '短时间内官方SDK交给你11',
+            japan: '彼は逃げるためにありとあらゆる手段を捜した。'
+          }
+        },
+        {
+          label: '文章5',
+          value: 'passage2',
+          info: {
+            type: '单词',
+            chinese: '短时间内官方SDK交给你22',
+            japan: '彼は逃げるためにありとあらゆる手段を捜した。'
+          }
+        },
+        {
+          label: '文章1',
+          value: 'passage1',
+          info: {
+            type: '单词',
+            chinese: '短时间内官方SDK交给你33',
+            japan: '彼は逃げるためにありとあらゆる手段を捜した。'
+          }
+        },
+        {
+          label: '文章1',
+          value: 'passage1',
+          info: {
+            type: '单词',
+            chinese: '短时间内官方SDK交给你55',
+            japan: '彼は逃げるためにありとあらゆる手段を捜した。'
+          }
+        }
+      ]
+    },
+    {
+      label: '收藏夹3',
+      value: '001',
+      child: [
+        {
+          label: '文章1',
+          value: 'passage1',
+          info: {
+            type: '单词',
+            chinese: '短时间内官方SDK交给你99',
+            japan: '彼は逃げるためにありとあらゆる手段を捜した。'
+          }
+        },
+        {
+          label: '文章1',
+          value: 'passage1',
+          info: {
+            type: '单词',
+            chinese: '短时间内官方SDK交给你98',
+            japan: '彼は逃げるためにありとあらゆる手段を捜した。'
+          }
+        },
+        {
+          label: '文章1',
+          value: 'passage1',
+          info: {
+            type: '单词',
+            chinese: '短时间内官方SDK交给你97',
+            japan: '彼は逃げるためにありとあらゆる手段を捜した。'
+          }
+        },
+        {
+          label: '文章1',
+          value: 'passage1',
+          info: {
+            type: '单词',
+            chinese: '短时间内官方SDK交给你',
+            japan: '彼は逃げるためにありとあらゆる手段を捜した。'
+          }
+        }
+      ]
+    }
+  ]);
   function handleSelect(key: string | number) {
     switch (key) {
       case 'logout':
@@ -116,12 +239,46 @@
     }
     &-right {
       display: flex;
+      margin-right: 94px;
       &-option {
         height: 54px;
         font-size: 16px;
         font-weight: bold;
         line-height: 54px;
         cursor: pointer;
+      }
+    }
+  }
+  .child-option {
+    display: flex;
+    width: 318px;
+    height: 50px;
+    align-items: center;
+    &-left {
+      border: 1px solid #6787d2;
+      border-radius: 4px;
+      color: #6787d2;
+      width: 40px;
+      height: 30px;
+      line-height: 30px;
+      margin-right: 8px;
+      text-align: center;
+    }
+    &-right {
+      width: 240px;
+      &-up {
+        max-width: 220px;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-size: 12px;
+        overflow: hidden;
+      }
+      &-down {
+        overflow: hidden;
+        max-width: 190px;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-size: 10px;
       }
     }
   }

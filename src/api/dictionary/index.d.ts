@@ -1,6 +1,6 @@
 export namespace Dic {
   interface WordInfo {
-    id?: string;
+    id: number;
     word: string;
     female?: string;
     male?: string;
@@ -11,10 +11,12 @@ export namespace Dic {
     sentence?: Array<Sentence>;
     jyc?: Array<string>;
     xjc?: Array<string>;
+    isCollected?: Array<number>;
   }
   interface Sentence {
     Chinese: string;
     Japanese: string;
+    num?: number;
   }
   interface WordRelated {
     word: string;

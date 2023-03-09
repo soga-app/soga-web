@@ -14,9 +14,9 @@
       </div>
       <div class="modal-down">
         <div class="modal-input">
-          <n-input placeholder="最多可以输入20个字">
+          <n-input v-model:value="inputVal" placeholder="最多可以输入20个字" clearable>
             <template #suffix>
-              <n-button color="#587acb">新建</n-button>
+              <n-button color="#587acb" @click="handleCreate">新建</n-button>
             </template>
           </n-input>
         </div>
@@ -24,7 +24,9 @@
           <div v-for="(item, index) in favoriteList" :key="`@${index}`" class="modal-favorite-item">
             <div class="modal-favorite-item-left">{{ item.name }}</div>
             <div class="modal-favorite-item-right"
-              ><n-button round type="tertiary" size="small">收藏</n-button>
+              ><n-button round type="tertiary" size="small" @click="emit('collectContent', item.id)"
+                >收藏</n-button
+              >
             </div>
           </div>
         </div>
@@ -34,9 +36,11 @@
 </template>
 
 <script lang="ts" setup>
-  import { computed, onMounted } from 'vue';
+  import { computed, onMounted, ref } from 'vue';
   const props = defineProps(['showBookMarkModal', 'favoriteList']);
-  const emit = defineEmits(['updateBookMarkModal']);
+  const emit = defineEmits(['updateBookMarkModal', 'createCollection', 'collectContent']);
+
+  let inputVal = ref('');
 
   const showModal = computed({
     get: () => props.showBookMarkModal,
@@ -47,6 +51,10 @@
   onMounted(() => {
     console.log('favoriteList is', props.favoriteList);
   });
+
+  const handleCreate = () => {
+    emit('createCollection', inputVal.value);
+  };
 </script>
 
 <style lang="less" scoped>

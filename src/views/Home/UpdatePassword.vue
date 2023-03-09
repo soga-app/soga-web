@@ -1,37 +1,44 @@
 <template>
-  <n-form ref="formRef" :rules="rules" :model="model">
-    <n-form-item-row path="fieldOldPassword">
-      <n-input
-        v-model:value="model.fieldOldPassword"
-        type="password"
-        show-password-on="click"
-        placeholder="请输入旧密码"
-        clearable
-        size="large"
-      />
-    </n-form-item-row>
-    <n-form-item-row path="fieldNewPassword1">
-      <n-input
-        v-model:value="model.fieldNewPassword1"
-        type="password"
-        show-password-on="click"
-        placeholder="请输入新密码"
-        clearable
-        size="large"
-      />
-    </n-form-item-row>
-    <n-form-item-row path="fieldNewPassword2">
-      <n-input
-        v-model:value="model.fieldNewPassword2"
-        type="password"
-        show-password-on="click"
-        placeholder="请再次输入新密码"
-        clearable
-        size="large"
-      />
-    </n-form-item-row>
-  </n-form>
-  <n-button type="primary" block strong @click="updatePassword"> 修改 </n-button>
+  <div class="update-password">
+    <div class="body-wrap">
+      <div class="title">更改密码</div>
+      <n-form ref="formRef" :rules="rules" :model="model">
+        <n-form-item-row path="fieldOldPassword">
+          <n-input
+            v-model:value="model.fieldOldPassword"
+            type="password"
+            show-password-on="click"
+            placeholder="请输入旧密码"
+            clearable
+            size="large"
+          />
+        </n-form-item-row>
+        <n-form-item-row path="fieldNewPassword1">
+          <n-input
+            v-model:value="model.fieldNewPassword1"
+            type="password"
+            show-password-on="click"
+            placeholder="请输入新密码"
+            clearable
+            size="large"
+          />
+        </n-form-item-row>
+        <n-form-item-row path="fieldNewPassword2">
+          <n-input
+            v-model:value="model.fieldNewPassword2"
+            type="password"
+            show-password-on="click"
+            placeholder="请再次输入新密码"
+            clearable
+            size="large"
+          />
+        </n-form-item-row>
+      </n-form>
+      <n-button style="margin-top: 180px" type="primary" block strong @click="updatePassword">
+        修改
+      </n-button>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -90,4 +97,20 @@
   }
 </script>
 
-<style scoped></style>
+<style scoped lang="less">
+  .update-password {
+    padding-top: 34px;
+    .title {
+      text-align: center;
+      font-size: 18px;
+      color: #587acb;
+    }
+    .body-wrap {
+      width: 420px;
+      height: 520px;
+      background: #fff;
+      margin: auto;
+      padding: 24px;
+    }
+  }
+</style>

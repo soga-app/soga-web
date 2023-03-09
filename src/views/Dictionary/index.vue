@@ -39,7 +39,11 @@
         </div>
       </div>
       <div class="word-content">
-        <word-card :word-info="wordInfo" @search-word="handelSearchWord" />
+        <word-card
+          :word-info="wordInfo"
+          @search-word="handelSearchWord"
+          @update-word-card="refresh"
+        />
       </div>
     </div>
   </div>
@@ -59,6 +63,7 @@
   let wordRelatedList = ref();
   let searchWord = ref('');
   let searchOptionShow = ref(false);
+  let curWord = ref('');
 
   const getWordInfo = async (word: string) => {
     wordInfo.value = await api.dictionary.getWordCard(word);
@@ -68,6 +73,7 @@
     () => route.params,
     (newVal: any, oldVal: any) => {
       if (newVal?.word) {
+        curWord.value = newVal.word;
         getWordInfo(newVal.word);
       }
     },
@@ -108,6 +114,10 @@
     // getWordInfo(word);
     router.push({ name: 'Dictionary', params: { word } });
   }
+  const refresh = () => {
+    console.log('刷新数据了');
+    getWordInfo(curWord.value);
+  };
 </script>
 
 <style scoped lang="less">

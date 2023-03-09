@@ -1,29 +1,37 @@
 <template>
-  <div>
-    <n-form ref="formRef" :rules="rules" :model="model">
-      <n-form-item-row path="fieldUsername">
-        <n-input v-model:value="model.fieldUsername" placeholder="用户名" clearable size="large" />
-      </n-form-item-row>
-      <n-form-item-row path="fieldPhone">
-        <n-input v-model:value="model.fieldPhone" placeholder="电话" clearable size="large" />
-      </n-form-item-row>
-      <n-form-item-row path="fieldEmail">
-        <n-input v-model:value="model.fieldEmail" placeholder="邮箱" clearable size="large" />
-      </n-form-item-row>
-      <n-form-item-row path="fieldGender">
-        <n-radio-group v-model:value="model.fieldGender" name="radiogroup">
-          <n-space justify="space-around" class="radio-space">
-            <span>性别</span>
-            <n-radio key="0" value="男"> 男 </n-radio>
-            <n-radio key="1" value="女"> 女 </n-radio>
-          </n-space>
-        </n-radio-group>
-      </n-form-item-row>
-      <n-form-item-row path="fieldAge">
-        <n-input v-model:value="model.fieldAge" placeholder="年龄" clearable size="large" />
-      </n-form-item-row>
-    </n-form>
-    <n-button type="primary" block strong @click="changeInfo"> 修改 </n-button>
+  <div class="updateInfo">
+    <div class="body-wrap">
+      <div class="title">更改个人信息</div>
+      <n-form ref="formRef" :rules="rules" :model="model">
+        <n-form-item-row path="fieldUsername">
+          <n-input
+            v-model:value="model.fieldUsername"
+            placeholder="用户名"
+            clearable
+            size="large"
+          />
+        </n-form-item-row>
+        <n-form-item-row path="fieldPhone">
+          <n-input v-model:value="model.fieldPhone" placeholder="电话" clearable size="large" />
+        </n-form-item-row>
+        <n-form-item-row path="fieldEmail">
+          <n-input v-model:value="model.fieldEmail" placeholder="邮箱" clearable size="large" />
+        </n-form-item-row>
+        <n-form-item-row path="fieldGender">
+          <n-radio-group v-model:value="model.fieldGender" name="radiogroup">
+            <n-space justify="space-around" class="radio-space">
+              <span>性别</span>
+              <n-radio key="0" value="男"> 男 </n-radio>
+              <n-radio key="1" value="女"> 女 </n-radio>
+            </n-space>
+          </n-radio-group>
+        </n-form-item-row>
+        <n-form-item-row path="fieldAge">
+          <n-input v-model:value="model.fieldAge" placeholder="年龄" clearable size="large" />
+        </n-form-item-row>
+      </n-form>
+      <n-button type="primary" block strong @click="changeInfo"> 修改 </n-button>
+    </div>
   </div>
 </template>
 
@@ -99,4 +107,20 @@
   }
 </script>
 
-<style scoped></style>
+<style scoped lang="less">
+  .updateInfo {
+    padding-top: 34px;
+    .title {
+      text-align: center;
+      font-size: 18px;
+      color: #587acb;
+    }
+    .body-wrap {
+      width: 420px;
+      height: 520px;
+      background: #fff;
+      margin: auto;
+      padding: 24px;
+    }
+  }
+</style>

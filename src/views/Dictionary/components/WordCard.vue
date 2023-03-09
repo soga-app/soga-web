@@ -69,12 +69,12 @@
       <div class="word-remain" :style="{ marginBottom: '0' }">
         <div class="word-key">双语例句</div>
         <div class="word-value">
-          <div v-if="wordInfo.sentence && wordInfo.sentence.length" class="sent-list">
+          <div v-if="wordInfo && wordInfo.sentence && wordInfo.sentence.length" class="sent-list">
             <virtual-list-load
               v-slot="slotProps"
               :list-data="wordInfo.sentence"
               :estimated-item-size="52"
-              height="400px"
+              :height="wordInfo.sentence.length > 5 ? '400px' : '240px'"
             >
               <div class="sent-info">
                 <div class="sent-info-left">
@@ -102,9 +102,13 @@
                     <svg-icon
                       color="#7f98d6"
                       font-size="16px"
-                      name="icon-favorite"
+                      :name="
+                        wordInfo.isCollected?.includes(slotProps.item.num)
+                          ? 'icon-favorites-fill'
+                          : 'icon-favorite'
+                      "
                       class="icon-favorite"
-                      @click="showBookMarkModal = true"
+                      @click="collectSentence(slotProps.item.num)"
                     />
                   </div>
                 </div>
@@ -119,6 +123,8 @@
       :show-book-mark-modal="showBookMarkModal"
       :favorite-list="favoriteList"
       @updateBookMarkModal="showBookMarkModal = false"
+      @createCollection="createCollection"
+      @collectContent="collectContent"
     ></book-mark-modal>
   </div>
 </template>
@@ -126,21 +132,26 @@
 <script lang="ts" setup>
   import { Dic } from '@/api/dictionary/index.d';
   import useClipboard from 'vue-clipboard3';
-  import { ref } from 'vue';
+  import { ref, onMounted, reactive } from 'vue';
+  import api from '@/api';
 
   interface Props {
     wordInfo: Dic.WordInfo;
   }
 
-  const emits = defineEmits(['searchWord']);
+  const emits = defineEmits(['searchWord', 'updateWordCard']);
   const props = defineProps<Props>();
   let showBookMarkModal = ref(false);
-  let favoriteList = ref([
-    { name: '日常对话' },
-    { name: '问路' },
-    { name: '厌恶' },
-    { name: '喜好' }
-  ]);
+  let favoriteList = ref();
+  let collectedSenNum = ref(0);
+
+  onMounted(() => {
+    getCollectionList();
+  });
+
+  const getCollectionList = async () => {
+    favoriteList.value = await api.collection.getCollectionList();
+  };
 
   // 关键词在例句中高亮
   function getHighlight(concent: string, keyword: string) {
@@ -177,6 +188,30 @@
       console.error(e);
     }
     return { copy };
+  };
+
+  const createCollection = async (name: string) => {
+    await api.collection.createCollectFile({ name });
+    getCollectionList();
+  };
+
+  const collectSentence = (sentenceNum: number) => {
+    showBookMarkModal.value = true;
+    collectedSenNum.value = sentenceNum;
+  };
+  const collectContent = async (id: number) => {
+    const wordId = props.wordInfo.id;
+    try {
+      await api.collection.collectContent({
+        sentenceNum: collectedSenNum.value,
+        colId: id,
+        wordId
+      });
+      emits('updateWordCard');
+      window.$message.success('句子收藏成功！');
+    } catch (e: any) {
+      window.$message.error(e);
+    }
   };
 </script>
 

@@ -12,6 +12,11 @@ export namespace Collection {
     sentence: string;
     mean: string;
     creatTime: string;
-    type?: number;
+    type?: string;
+  }
+  interface CollectContentParam {
+    colId: number;
+    sentenceNum: number;
+    wordId: number;
   }
 }

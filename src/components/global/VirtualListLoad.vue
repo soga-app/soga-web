@@ -122,7 +122,6 @@
       let rect = node.getBoundingClientRect();
       let height = rect.height;
       let index = +node.id.slice(1);
-      console.log('index in updateItemsSize is', index);
       let oldHeight = positions[index].height;
       let dValue = oldHeight - height;
       //存在差值

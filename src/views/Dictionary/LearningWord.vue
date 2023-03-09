@@ -99,7 +99,7 @@
     :mask-closable="false"
     preset="dialog"
     title="确认"
-    content="你确认"
+    content="您允许本网站自动播放音频吗？"
     positive-text="确认"
     @positive-click="onPositiveClick"
   />
