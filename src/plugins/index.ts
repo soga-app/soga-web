@@ -5,6 +5,7 @@ import TimeCount from '@/components/global/TimeCount.vue';
 import VirtualListLoad from '@/components/global/VirtualListLoad.vue';
 import BookMarkModal from '@/components/global/BookMarkModal.vue';
 import BookMarkDropDown from '@/components/global/BookMarkDropDown.vue';
+import BallLoading from '@/components/global/BallLoading.vue';
 
 export default {
   install(app: any, options: any) {
@@ -16,5 +17,6 @@ export default {
     app.component('VirtualListLoad', VirtualListLoad);
     app.component('BookMarkModal', BookMarkModal);
     app.component('BookMarkDropDown', BookMarkDropDown);
+    app.component('BallLoading', BallLoading);
   }
 };

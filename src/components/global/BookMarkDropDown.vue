@@ -1,16 +1,18 @@
 <template>
   <!-- 可以通过 slot 为 father 的插槽自定义 父选项的样式；
-  通过 slot 为 child 的插槽自定义 子选项的样式； -->
+  通过 slot 为 child 的插槽自定义 子选项的样式；
+  默认展示第一个子选项
+ -->
   <div class="book-mark-dropdown" @mouseover="handleMouseOver" @mouseout="handleMouseOut">
     <slot name="trigger" class="trigger"></slot>
     <div id="display-content">
-      <div class="display-content-wrap">
+      <div v-if="options" class="display-content-wrap">
         <div class="display-content-left">
           <div
-            v-for="(item, index) in options"
+            v-for="item in options"
             :key="item.label"
             class="prarent-option-item"
-            @click="changeChildOption(index)"
+            @click="updateChildOption(item.value)"
           >
             <div v-if="!$slots.father" class="father-option-inner">
               {{ item.label }}
@@ -27,33 +29,21 @@
           </div>
         </div>
       </div>
+      <template v-else>
+        <list-loading />
+      </template>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
   import { ref, onMounted } from 'vue';
-  interface OptionItem {
-    label: string;
-    value: string;
-    info?: object;
-    child: Array<{
-      label: string;
-      value: string;
-      info?: object;
-    }>;
-  }
-
   interface BookMarkProps {
     options: Array<OptionItem>;
+    curChildOption: Array<ChildOptionItem>;
   }
   const props = defineProps<BookMarkProps>();
-
-  let curChildOption = ref();
-
-  onMounted(() => {
-    curChildOption.value = props.options[0].child;
-  });
+  const emits = defineEmits(['updateChildOption']);
 
   const handleMouseOver = () => {
     (document.getElementById('display-content') as HTMLElement).style.display = 'block';
@@ -63,8 +53,8 @@
     (document.getElementById('display-content') as HTMLElement).style.display = 'none';
   };
 
-  const changeChildOption = (num: number) => {
-    curChildOption.value = props.options[num].child;
+  const updateChildOption = (value: any) => {
+    emits('updateChildOption', value);
   };
 </script>
 
@@ -75,8 +65,7 @@
     .tirgger {
     }
     #display-content {
-      width: 400px;
-
+      width: 410px;
       background: #fff;
       box-shadow: 0 0 10px 2px rgba(0, 0, 0, 0.06);
       padding: 12px 14px;
@@ -90,11 +79,11 @@
       max-height: 400px;
     }
     .display-content-left {
-      margin-right: 12px;
-      padding-right: 4px;
+      margin-right: 8px;
+
       overflow-y: auto;
       float: left;
-      border-right: 1px solid #ddd;
+
       height: 100%;
       .prarent-option-item {
         cursor: pointer;
@@ -107,6 +96,8 @@
       max-height: 500px;
       float: left;
       overflow-y: auto;
+      padding-left: 10px;
+      border-left: 1px solid #ddd;
       .children-option-item {
         cursor: pointer;
         &:hover {
@@ -122,10 +113,10 @@
       height: 50px;
     }
     .father-option-inner {
-      width: 64px;
+      width: 70px;
     }
     .child-option-inner {
-      width: 240px;
+      width: 230px;
     }
   }
 </style>

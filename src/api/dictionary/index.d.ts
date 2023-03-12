@@ -1,6 +1,6 @@
 export namespace Dic {
   interface WordInfo {
-    id: number;
+    id?: number;
     word: string;
     female?: string;
     male?: string;

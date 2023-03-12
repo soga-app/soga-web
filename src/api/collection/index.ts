@@ -6,7 +6,7 @@ export default {
   createCollectFile: (params: { name: string }): Promise<void> =>
     http.post('/api/collections/insert', null, { params }),
   // 获取收藏夹内容
-  getCollectionFile: (param: { id: number }): Promise<Collection.CollectionContent> =>
+  getCollectionFile: (param: { colId: number }): Promise<Array<Collection.CollectionContent>> =>
     http.get('/api/collections/select', param),
   // 收藏夹列表
   getCollectionList: (): Promise<Array<Collection.CollectionItem>> =>

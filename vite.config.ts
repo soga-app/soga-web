@@ -23,6 +23,11 @@ export default defineConfig({
         target: 'http://43.139.46.117:8081',
         changeOrigin: true,
         rewrite: (path: string) => path.replace(/^\/api/, '')
+      },
+      '/gpt': {
+        target: 'http://43.155.73.43:80',
+        changeOrigin: true,
+        rewrite: (path: string) => path.replace(/^\/gpt/, '')
       }
     }
   },

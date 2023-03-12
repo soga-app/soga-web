@@ -27,7 +27,11 @@
         </div>
         <div class="nav-right-option" @click="goTo('userCenter')">个人中心</div>
         <!-- <div class="nav-right-option">足迹</div> -->
-        <book-mark-drop-down :options="bookMarkOptions">
+        <book-mark-drop-down
+          :options="bookMarkOptions"
+          :cur-child-option="curChildOption"
+          @updateChildOption="updateChildOption"
+        >
           <template #trigger>
             <div class="nav-right-option">足迹</div>
           </template>
@@ -35,8 +39,8 @@
             <div class="child-option">
               <div class="child-option-left">{{ option.info.type }}</div>
               <div class="child-option-right">
-                <div class="child-option-right-up">{{ option.info.japan }}</div>
-                <div class="child-option-right-down">{{ option.info.chinese }}</div>
+                <div class="child-option-right-up">{{ option.info.sentence }}</div>
+                <div class="child-option-right-down">{{ option.info.mean }}</div>
               </div>
             </div>
           </template>
@@ -59,10 +63,12 @@
   import boyImg from '@/assets/img/user/boy.png';
   import { UserStore } from '@/stores';
   import { useRoute, useRouter } from 'vue-router';
-  import { computed, reactive } from 'vue';
+  import { computed, ref, onMounted, watch } from 'vue';
+
   const route = useRoute();
   const router = useRouter();
   const userStore = UserStore();
+
   let hideNav = computed(() => {
     return route.meta.hideNav;
   });
@@ -80,116 +86,24 @@
       key: 'changePassword'
     }
   ];
-  let bookMarkOptions = reactive([
-    {
-      label: '收藏夹1',
-      value: '001',
-      child: [
-        {
-          label: '文章1',
-          value: 'passage1',
-          info: {
-            type: '单词',
-            chinese: '短时间内官方SDK交给你',
-            japan: '彼は逃げるためにありとあらゆる手段を捜した。'
-          }
-        },
-        {
-          label: '文章2',
-          value: 'passage1',
-          info: {
-            type: '单词',
-            chinese: '短时间内官方SDK交给你',
-            japan: '彼は逃げるためにありとあらゆる手段を捜した。'
-          }
-        }
-      ]
-    },
-    {
-      label: '收藏夹2',
-      value: '002',
-      child: [
-        {
-          label: '文章4',
-          value: 'passage1',
-          info: {
-            type: '单词',
-            chinese: '短时间内官方SDK交给你11',
-            japan: '彼は逃げるためにありとあらゆる手段を捜した。'
-          }
-        },
-        {
-          label: '文章5',
-          value: 'passage2',
-          info: {
-            type: '单词',
-            chinese: '短时间内官方SDK交给你22',
-            japan: '彼は逃げるためにありとあらゆる手段を捜した。'
-          }
-        },
-        {
-          label: '文章1',
-          value: 'passage1',
-          info: {
-            type: '单词',
-            chinese: '短时间内官方SDK交给你33',
-            japan: '彼は逃げるためにありとあらゆる手段を捜した。'
-          }
-        },
-        {
-          label: '文章1',
-          value: 'passage1',
-          info: {
-            type: '单词',
-            chinese: '短时间内官方SDK交给你55',
-            japan: '彼は逃げるためにありとあらゆる手段を捜した。'
-          }
-        }
-      ]
-    },
-    {
-      label: '收藏夹3',
-      value: '001',
-      child: [
-        {
-          label: '文章1',
-          value: 'passage1',
-          info: {
-            type: '单词',
-            chinese: '短时间内官方SDK交给你99',
-            japan: '彼は逃げるためにありとあらゆる手段を捜した。'
-          }
-        },
-        {
-          label: '文章1',
-          value: 'passage1',
-          info: {
-            type: '单词',
-            chinese: '短时间内官方SDK交给你98',
-            japan: '彼は逃げるためにありとあらゆる手段を捜した。'
-          }
-        },
-        {
-          label: '文章1',
-          value: 'passage1',
-          info: {
-            type: '单词',
-            chinese: '短时间内官方SDK交给你97',
-            japan: '彼は逃げるためにありとあらゆる手段を捜した。'
-          }
-        },
-        {
-          label: '文章1',
-          value: 'passage1',
-          info: {
-            type: '单词',
-            chinese: '短时间内官方SDK交给你',
-            japan: '彼は逃げるためにありとあらゆる手段を捜した。'
-          }
-        }
-      ]
+  let bookMarkOptions = ref<Array<OptionItem>>([]);
+  let curChildOption = ref<Array<ChildOptionItem>>([]);
+
+  onMounted(() => {
+    if (route.name !== 'Login') {
+      initCollection();
     }
-  ]);
+  });
+
+  watch(
+    () => route.name,
+    (newVal, oldVal) => {
+      if (oldVal === 'Login') {
+        initCollection();
+      }
+    }
+  );
+
   function handleSelect(key: string | number) {
     switch (key) {
       case 'logout':
@@ -216,10 +130,39 @@
         router.push({ name: 'HomePage' });
     }
   }
+
+  const initCollection = async () => {
+    const fatherOptions = await api.collection.getCollectionList();
+    // 默认展示第一个收藏夹的内容
+    await updateChildOption(fatherOptions[0].id);
+    fatherOptions.forEach((item, index) => {
+      if (index === 0) {
+        bookMarkOptions.value?.push({
+          label: item.name,
+          value: item.id,
+          child: curChildOption.value
+        });
+      } else {
+        bookMarkOptions.value?.push({
+          label: item.name,
+          value: item.id
+        });
+      }
+    });
+  };
+
+  const updateChildOption = async (colId: number) => {
+    const defaultChild = await api.collection.getCollectionFile({ colId });
+    const childFirstOption = defaultChild.map((item: any) => {
+      const { wordId, colId } = item;
+      return { label: item.type, value: { wordId, colId }, info: { ...item } };
+    });
+    curChildOption.value = childFirstOption;
+  };
 </script>
 <style scoped lang="less">
   .nav_wrapper {
-    padding: 0 100px 0 100px;
+    padding: 0 55px 0 100px;
     height: 54px;
     background: #587acb;
     box-shadow: 0px 4px 4px 0px rgba(138, 138, 138, 0.25);
@@ -241,6 +184,8 @@
       display: flex;
       margin-right: 94px;
       &-option {
+        width: 85px;
+        text-align: center;
         height: 54px;
         font-size: 16px;
         font-weight: bold;
@@ -251,7 +196,7 @@
   }
   .child-option {
     display: flex;
-    width: 318px;
+    width: 312px;
     height: 50px;
     align-items: center;
     &-left {

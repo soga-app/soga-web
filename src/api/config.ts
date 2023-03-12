@@ -34,9 +34,14 @@ class RequestHttp {
     this.service.interceptors.response.use(
       (response: AxiosResponse) => {
         const responseCode = response.status;
-        if ((responseCode >= 200 && responseCode < 300) || responseCode === 304) {
+        if (
+          (responseCode >= 200 && responseCode < 300) ||
+          responseCode === 304 ||
+          responseCode === 101
+        ) {
           return Promise.resolve(response);
         } else {
+          console.log('出错了', responseCode);
           return Promise.reject(response);
         }
       },

@@ -11,7 +11,7 @@
 </template>
 
 <script lang="ts" setup>
-  import { ref, toRaw } from 'vue';
+  import { ref, toRef } from 'vue';
   const props = defineProps({
     name: {
       type: String,
@@ -35,10 +35,10 @@
     }
   });
 
-  let curColor = ref('');
-  let name = toRaw(props.name);
-  let color = toRaw(props.color);
-  curColor.value = color;
+  let curColor = ref<string>('');
+  let name = toRef(props, 'name');
+  let color = toRef(props, 'color');
+  curColor = color;
 
   // if (props.hoverColor) {
   //   console.log('yes', props.hoverColor);

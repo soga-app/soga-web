@@ -194,13 +194,14 @@
     await api.collection.createCollectFile({ name });
     getCollectionList();
   };
-
+  // 点击收藏按钮
   const collectSentence = (sentenceNum: number) => {
     showBookMarkModal.value = true;
     collectedSenNum.value = sentenceNum;
   };
+  // 将例句收藏至某个收藏夹
   const collectContent = async (id: number) => {
-    const wordId = props.wordInfo.id;
+    const wordId = props.wordInfo.id as number;
     try {
       await api.collection.collectContent({
         sentenceNum: collectedSenNum.value,
