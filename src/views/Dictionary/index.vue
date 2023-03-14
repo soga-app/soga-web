@@ -99,7 +99,6 @@
   function handelOptionChecked(checkedOption: string) {
     searchOptionShow.value = false;
     searchWord.value = checkedOption;
-    // getWordInfo(checkedOption);
     router.push({ name: 'Dictionary', params: { word: checkedOption } });
   }
   function leave() {
@@ -111,11 +110,9 @@
   }
   async function handelSearchWord(word: string) {
     wordInfo.value = [];
-    // getWordInfo(word);
     router.push({ name: 'Dictionary', params: { word } });
   }
   const refresh = () => {
-    console.log('刷新数据了');
     getWordInfo(curWord.value);
   };
 </script>

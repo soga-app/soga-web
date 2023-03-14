@@ -203,10 +203,20 @@
     }
   };
 
-  const showTrans = (index: number) => {
+  const showTrans = async (index: number) => {
     if (index === 0) {
       conversation.value[0].transContent =
         '亲爱的小主，欢迎来到SOGA日语的情景口语练习基地，请在下方的输入框输入语句开始与智能机器人的对话吧！';
+    } else {
+      const { trans_result } = await api.translation.translate({
+        query: conversation.value[index].originContent,
+        from: 'jp',
+        to: 'zh'
+      });
+      conversation.value[index].transContent = trans_result.reduce(
+        (pre, next) => pre + next.dst,
+        ''
+      );
     }
   };
 

@@ -11,7 +11,12 @@
               <div class="title-text">中日双语对照新闻</div>
             </div>
             <div class="category2">
-              <div v-for="(item, index) in econonicCol" :key="index" class="child-category">
+              <div
+                v-for="(item, index) in econonicCol"
+                :key="index"
+                class="child-category"
+                @click="chooseCatergory2(item)"
+              >
                 {{ item.catergory2 }}
               </div>
             </div>
@@ -24,7 +29,12 @@
               <div class="title-text">日本等级考试N1~N5</div>
             </div>
             <div class="category2">
-              <div v-for="(item, index) in examCol" :key="index" class="child-category">
+              <div
+                v-for="(item, index) in examCol"
+                :key="index"
+                class="child-category"
+                @click="chooseCatergory2(item)"
+              >
                 {{ item.catergory2 }}
               </div></div
             >
@@ -37,7 +47,12 @@
               <div class="title-text">娱乐影音</div>
             </div>
             <div class="category2">
-              <div v-for="(item, index) in funCol" :key="index" class="child-category">
+              <div
+                v-for="(item, index) in funCol"
+                :key="index"
+                class="child-category"
+                @click="chooseCatergory2(item)"
+              >
                 {{ item.catergory2 }}
               </div></div
             >
@@ -45,7 +60,40 @@
         </n-space>
       </div>
     </div>
-    <div class="community-right"></div>
+    <div class="community-right">
+      <div v-if="!showPassage">
+        <div v-if="introInfo" class="column-intro">
+          <div class="column-intro-left">
+            <img :src="introInfo.card" alt="" />
+          </div>
+          <div class="column-intro-right">
+            <div class="column-intro-right-name">{{ introInfo.catergory2 }}</div>
+            <div class="column-intro-right-introduction">{{
+              introInfo.catergory2Introduction
+            }}</div>
+          </div>
+        </div>
+        <list-loading v-else :has-padding="true" />
+        <div v-if="curPassageList.length" class="column-passage">
+          <div
+            v-for="item in curPassageList"
+            :key="item.passageTitle"
+            class="column-passage-item"
+            @click="goToPassage(item)"
+          >
+            {{ item.passageTitle }}</div
+          >
+          <div class="pagination-style">
+            <n-pagination v-model:page="pageNum" :page-count="pageCount" @update:page="pageChange"
+          /></div>
+        </div>
+        <list-loading v-else :row="2" :has-padding="true" />
+      </div>
+      <div v-else class="passage">
+        <div class="passage-title">{{ curPassage?.title }}</div>
+        <div class="passage-content" v-html="curPassage.content"></div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -53,11 +101,24 @@
   import { reactive, onMounted, ref } from 'vue';
   import { Community } from '@/api/community/index.d';
   import api from '@/api';
+  import { useRouter } from 'vue-router';
+  interface PassageContent {
+    title: string;
+    content: string;
+  }
+
+  const router = useRouter();
   let econonicCol = ref<Array<Community.CommunityColumn>>([]);
   let examCol = ref<Array<Community.CommunityColumn>>([]);
   let funCol = ref<Array<Community.CommunityColumn>>([]);
   let iconName = reactive(['icon-wenzhang', 'icon-kaoshi', 'icon-yingyinqu']);
   let communityColumn = ref<Array<Community.CommunityColumn>>();
+  let introInfo = ref();
+  let curPassageList = ref<Array<Community.PassageItem>>([]);
+  let pageNum = ref(1);
+  let showPassage = ref(false);
+  let pageCount = ref(0);
+  let curPassage = ref<PassageContent>({ title: '', content: '' });
 
   onMounted(async () => {
     communityColumn.value = await api.community.getCommunityList();
@@ -76,14 +137,47 @@
           break;
       }
     });
+    introInfo.value = communityColumn.value[0];
+    changeCurPassageList(1);
   });
+  const changeCurPassageList = async (page: number) => {
+    const { catergory2 } = introInfo.value;
+    const {
+      communityContentList: { records, total }
+    } = await api.community.getPassageListByName({ catergory2, page, size: 10 });
+    curPassageList.value = records;
+    pageCount.value = Math.ceil(total / 10);
+  };
+  const chooseCatergory2 = (intro: any) => {
+    showPassage.value = false;
+    curPassageList.value = [];
+    introInfo.value = intro;
+    pageNum.value = 1;
+    changeCurPassageList(1);
+  };
+
+  const goToPassage = (item: Community.PassageItem) => {
+    //说明文章是文件形式不是字符串形式
+    if (item.passageContent.startsWith('http')) {
+      router.push({ name: 'CommunityContent' });
+    } else {
+      showPassage.value = true;
+      curPassage.value.title = item.passageTitle;
+      curPassage.value.content = item.passageContent;
+    }
+  };
+
+  const pageChange = (page: number) => {
+    pageNum.value = page;
+    changeCurPassageList(page);
+  };
 </script>
 
 <style lang="less" scoped>
   .community {
     display: flex;
     justify-content: center;
-    padding-top: 34px;
+    padding-top: 16px;
     &-left,
     &-right {
       width: 400px;
@@ -124,6 +218,65 @@
     &-right {
       width: 550px;
       background: #fff;
+      padding: 16px;
+      max-height: 600px;
+      overflow-y: auto;
+      .column-intro {
+        display: flex;
+        &-left {
+          margin-right: 20px;
+          img {
+            width: 120px;
+            height: 120px;
+          }
+        }
+        &-right {
+          &-name {
+            margin-top: 18px;
+            font-size: 22px;
+            font-family: Noto Sans SC-Bold, Noto Sans SC;
+            font-weight: bold;
+            color: #8a8a8a;
+            line-height: 26px;
+          }
+          &-introduction {
+            margin-top: 16px;
+            font-size: 16px;
+            font-family: Noto Sans SC-Regular, Noto Sans SC;
+            font-weight: 400;
+            color: #8a8a8a;
+          }
+        }
+      }
+      .column-passage {
+        &-item {
+          height: 36px;
+          border-bottom: 1px dashed #d5cfcf;
+          cursor: pointer;
+          line-height: 36px;
+          color: #8a8a8a;
+          font-size: 14px;
+          &:hover {
+            background: #d9e2f665;
+          }
+        }
+      }
+    }
+    .pagination-style {
+      margin-top: 16px;
+      display: flex;
+      justify-content: flex-end;
+    }
+    .passage {
+      &-title {
+        text-align: center;
+        font-size: 16px;
+        font-weight: bold;
+        color: #8a8a8a;
+      }
+      &-content {
+        color: #8a8a8a;
+      }
     }
   }
 </style>
