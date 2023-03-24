@@ -38,7 +38,9 @@
                 <div v-show="item.transContent" class="text-trans">{{ item.transContent }}</div>
               </div>
             </template>
-            <n-button quaternary type="info"> 语音播放 </n-button>
+            <n-button quaternary type="info" @click="audioPlay(item.originContent)">
+              语音播放
+            </n-button>
             <n-button quaternary type="info" @click="showTrans(index)"> 翻译 </n-button>
             <n-button
               quaternary
@@ -120,6 +122,13 @@
   let robot_role = ref('');
   let user_text = ref('');
   let generateBtnShow = ref(true);
+  let audioSrc = ref('');
+  const welcomeText =
+    '亲爱的小主，欢迎来到SOGA日语的情景口语练习基地，请在下方的输入框输入语句开始与智能机器人的对话吧！';
+  const welcomeTextJP =
+    '親愛なるマスター、SOGA日本語の情景口語練習基地へようこそ、下の入力ボックスに文を入力してアンドロイドとの会話を始めてください！';
+  let audioSrcMap = new Map();
+  audioSrcMap.set(welcomeTextJP, 'http://43.139.46.117:8083/upload-XunFei/1679288914665.mp3');
 
   onMounted(() => {
     init();
@@ -132,8 +141,7 @@
     if (isSceneSet.value) {
       conversation.value.push({
         role: 'robot',
-        originContent:
-          '親愛なるマスター、SOGA日本語の情景口語練習基地へようこそ、下の入力ボックスに文を入力してアンドロイドとの会話を始めてください！',
+        originContent: welcomeTextJP,
         scene: scene.value,
         userRole: user_role.value,
         robotRole: robot_role.value,
@@ -141,6 +149,7 @@
         transContent: ''
       });
     }
+    audioPlay(welcomeTextJP);
   });
 
   const init = () => {
@@ -197,16 +206,34 @@
         robot_role: robot_role.value,
         user_text: user_text.value
       });
-      conversation.value[conversation.value.length - 1].originContent = res;
+      let cleanText = res.replace(/\r|\n/gi, '');
+      conversation.value[conversation.value.length - 1].originContent = cleanText;
       generateBtnShow.value = true;
       user_text.value = '';
+      audioPlay(cleanText);
     }
+  };
+
+  const play = () => {
+    let audioPlayer = document.getElementById('textAudioPlayer') as HTMLAudioElement;
+    audioPlayer.play();
+  };
+
+  const audioPlay = async (cleanText: string) => {
+    if (audioSrcMap.has(cleanText)) {
+      audioSrc.value = audioSrcMap.get(cleanText);
+    } else {
+      const res = await api.oraltrain.textToAudio({ text: cleanText });
+      audioSrc.value = res;
+      audioSrcMap.set(cleanText, res);
+    }
+    const audio = new Audio(audioSrc.value);
+    audio.play();
   };
 
   const showTrans = async (index: number) => {
     if (index === 0) {
-      conversation.value[0].transContent =
-        '亲爱的小主，欢迎来到SOGA日语的情景口语练习基地，请在下方的输入框输入语句开始与智能机器人的对话吧！';
+      conversation.value[0].transContent = welcomeText;
     } else {
       const { trans_result } = await api.translation.translate({
         query: conversation.value[index].originContent,

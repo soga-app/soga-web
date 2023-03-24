@@ -196,7 +196,7 @@
           getHasLearningWordPlan();
           userStore.setToken(res.token);
           userStore.setUserInfo(res.user);
-          router.push('./index');
+          router.push({ name: 'HomePage' });
         } catch (error) {}
       } else {
         console.log(errors);
@@ -216,7 +216,7 @@
           getHasLearningWordPlan();
           userStore.setToken(res.token);
           userStore.setUserInfo(res.user);
-          router.push('./index');
+          router.push({ name: 'HomePage' });
         } catch (error) {}
       } else {
         console.log(errors);
@@ -230,7 +230,6 @@
     } else {
       userStore.setHasLearningWordPlan(true);
     }
-    console.log('res is', res);
   };
 </script>
 

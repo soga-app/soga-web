@@ -3,8 +3,8 @@ import qs from 'qs';
 axios.defaults.timeout = 600000;
 
 const config = {
-  // 设置超时时间（10s）
-  timeout: 10000,
+  // 设置超时时间（60s）
+  timeout: 60000,
   // 跨域时候允许携带凭证
   withCredentials: true
 };
@@ -75,6 +75,7 @@ class RequestHttp {
           case 404:
             break;
           case 401: //用户token过期
+            window.$message.error('用户身份过期，需要重新登录');
             window.location.href = '/login';
         }
         return Promise.reject(error);
@@ -90,7 +91,7 @@ class RequestHttp {
   async request(config: AxiosRequestConfig, hasErrTips = false, requireOriginalRes = false) {
     try {
       const res = await this.service.request(config);
-      if (res.status === 204 || res.status === 304) {
+      if (res.status === 204) {
         //有缓存
         return Promise.resolve();
       }

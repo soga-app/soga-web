@@ -81,8 +81,6 @@
   }
 
   watch(alterDate, async (newVal) => {
-    console.log('watch');
-    // setHightLightDate(alterDate.year, alterDate.month);
     recordInfo.value = await api.dictionary.getPlanRecordByCalendar({
       year: alterDate.year,
       month: alterDate.month + 1
@@ -128,18 +126,11 @@
   });
 
   const setHightLightDate = async (year: number, month: number) => {
-    console.log('执行setHightLightDate', year, month);
     recordInfo.value = await api.dictionary.getPlanRecordByCalendar({ year, month: month + 1 });
     hightLightDates = [];
     recordInfo.value.forEach((item: any) => {
       hightLightDates.push(item.dayN);
     });
-    console.log(
-      '执行完setHighLightDate recordInfo is',
-      recordInfo.value,
-      'hightLightDates is',
-      hightLightDates
-    );
   };
 
   function updateYear(val: number) {
@@ -177,7 +168,6 @@
   }
 
   function setDays(year: number, month: number) {
-    console.log('执行setDays', year, month);
     days.length = 0;
     const d = new Date();
     d.setFullYear(year);
@@ -217,13 +207,6 @@
       });
     }
     // 设置高亮部分
-    // debugger;
-    console.log(
-      'in setDays hightLightDates is',
-      hightLightDates,
-      'recordInfo is',
-      recordInfo.value
-    );
     for (let i = 0; i < 42; i++) {
       let index = hightLightDates.indexOf(days[i].date);
       if (
@@ -232,7 +215,6 @@
         days[i].month === alterDate.month &&
         days[i].year === alterDate.year
       ) {
-        console.log('index is', index, 'yes');
         days[i].isHighlight = true;
         if (recordInfo.value) {
           let info = recordInfo.value[index];
@@ -240,10 +222,8 @@
           days[i].hightLightInfo = { learnedNum, reviewedNum };
         }
       } else {
-        console.log('index is', index, 'no');
       }
     }
-    console.log('执行完setDays');
   }
 
   function getFullDayOfMonth(year: number, month: number) {

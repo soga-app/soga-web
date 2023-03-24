@@ -32,8 +32,9 @@
           :cur-child-option="curChildOption"
           @updateChildOption="updateChildOption"
         >
+          <!-- @updateDropDown="updateDropDown" -->
           <template #trigger>
-            <div class="nav-right-option">足迹</div>
+            <div class="nav-right-option">收藏夹</div>
           </template>
           <template #child="{ option }">
             <div class="child-option">
@@ -89,16 +90,11 @@
   let bookMarkOptions = ref<Array<OptionItem>>([]);
   let curChildOption = ref<Array<ChildOptionItem>>([]);
 
-  onMounted(() => {
-    if (route.name !== 'Login') {
-      initCollection();
-    }
-  });
-
   watch(
     () => route.name,
     (newVal, oldVal) => {
-      if (oldVal === 'Login') {
+      console.log(oldVal, newVal);
+      if (oldVal === 'Login' && newVal === 'HomePage') {
         initCollection();
       }
     }
@@ -132,6 +128,7 @@
   }
 
   const initCollection = async () => {
+    bookMarkOptions.value = [];
     const fatherOptions = await api.collection.getCollectionList();
     // 默认展示第一个收藏夹的内容
     await updateChildOption(fatherOptions[0].id);
@@ -196,7 +193,7 @@
   }
   .child-option {
     display: flex;
-    width: 312px;
+    width: 304px;
     height: 50px;
     align-items: center;
     &-left {
@@ -210,7 +207,7 @@
       text-align: center;
     }
     &-right {
-      width: 240px;
+      width: 230px;
       &-up {
         max-width: 220px;
         text-overflow: ellipsis;

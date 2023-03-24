@@ -141,6 +141,7 @@
     changeCurPassageList(1);
   });
   const changeCurPassageList = async (page: number) => {
+    curPassageList.value = [];
     const { catergory2 } = introInfo.value;
     const {
       communityContentList: { records, total }
@@ -150,7 +151,7 @@
   };
   const chooseCatergory2 = (intro: any) => {
     showPassage.value = false;
-    curPassageList.value = [];
+
     introInfo.value = intro;
     pageNum.value = 1;
     changeCurPassageList(1);

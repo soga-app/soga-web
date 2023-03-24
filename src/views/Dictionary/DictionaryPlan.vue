@@ -43,8 +43,10 @@
   import api from '@/api';
   import { Dic } from '@/api/dictionary/index.d';
   import { UserStore } from '@/stores';
+  import { useRouter } from 'vue-router';
 
   const userStore = UserStore();
+  const router = useRouter();
   let dictList = ref<Array<Dic.Dictionary>>();
   let pickDictId = ref(0);
   let pickIndex = ref(0);
@@ -84,6 +86,7 @@
     const res = await api.dictionary.addPlan({ dictId, timeSpan });
     if (!res) {
       userStore.setHasLearningWordPlan(true);
+      router.push({ name: 'Reciteword' });
     }
   }
 </script>

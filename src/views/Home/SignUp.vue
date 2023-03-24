@@ -117,7 +117,7 @@
             email: model.fieldEmail
           });
           window.$message.success('注册成功');
-          router.push('./login');
+          router.push({ name: 'Login' });
         } catch (error) {}
       } else {
         console.log(errors);

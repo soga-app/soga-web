@@ -3,16 +3,16 @@
   通过 slot 为 child 的插槽自定义 子选项的样式；
   默认展示第一个子选项
  -->
-  <div class="book-mark-dropdown" @mouseover="handleMouseOver" @mouseout="handleMouseOut">
+  <div class="book-mark-dropdown" @mouseenter="handleMouseEnter" @mouseleave="handleMouseLeave">
     <slot name="trigger" class="trigger"></slot>
     <div id="display-content">
       <div v-if="options" class="display-content-wrap">
         <div class="display-content-left">
           <div
-            v-for="item in options"
+            v-for="(item, index) in options"
             :key="item.label"
-            class="prarent-option-item"
-            @click="updateChildOption(item.value)"
+            :class="`prarent-option-item ${curParentChoice === index ? 'curParentOption' : ''}`"
+            @click="updateChildOption(item.value, index)"
           >
             <div v-if="!$slots.father" class="father-option-inner">
               {{ item.label }}
@@ -44,16 +44,19 @@
   }
   const props = defineProps<BookMarkProps>();
   const emits = defineEmits(['updateChildOption']);
+  let curParentChoice = ref(0);
 
-  const handleMouseOver = () => {
-    (document.getElementById('display-content') as HTMLElement).style.display = 'block';
+  const handleMouseEnter = () => {
+    if (props.options && props.options.length)
+      (document.getElementById('display-content') as HTMLElement).style.display = 'block';
   };
 
-  const handleMouseOut = () => {
+  const handleMouseLeave = () => {
     (document.getElementById('display-content') as HTMLElement).style.display = 'none';
   };
 
-  const updateChildOption = (value: any) => {
+  const updateChildOption = (value: any, index: number) => {
+    curParentChoice.value = index;
     emits('updateChildOption', value);
   };
 </script>
@@ -90,6 +93,9 @@
         &:hover {
           background: #d8e1f684;
         }
+      }
+      .curParentOption {
+        background: #d8e1f684;
       }
     }
     .display-content-right {
