@@ -206,7 +206,8 @@
       await api.collection.collectContent({
         sentenceNum: collectedSenNum.value,
         colId: id,
-        wordId
+        wordId,
+        type: '句子'
       });
       emits('updateWordCard');
       window.$message.success('句子收藏成功！');

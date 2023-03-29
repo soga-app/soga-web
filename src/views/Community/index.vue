@@ -1,6 +1,6 @@
 <template>
   <div class="community">
-    <div class="community-left">
+    <div v-if="!showTrans" class="community-left">
       <div class="community-left-content">
         <n-space :size="30" vertical>
           <div class="category">
@@ -90,8 +90,29 @@
         <list-loading v-else :row="2" :has-padding="true" />
       </div>
       <div v-else class="passage">
-        <div class="passage-title">{{ curPassage?.title }}</div>
-        <div class="passage-content" v-html="curPassage.content"></div>
+        <div class="passage-operation">
+          <svg-icon
+            style="margin-right: 16px"
+            name="icon-shuyi_fanyi-105"
+            font-size="20px"
+            hover-color="#587acb"
+            @click="showTransPassage"
+          />
+          <svg-icon
+            name="icon-xiazai"
+            font-size="20px"
+            hover-color="#587acb"
+            @click="downloadPdf(curPassage.title)"
+          />
+        </div>
+        <div id="pdfcontent">
+          <div class="passage-title">{{ curPassage?.title }}</div>
+          <div class="passage-content" v-html="curPassage.content"></div
+        ></div>
+      </div>
+      <div v-if="showTrans" class="passage">
+        <!-- <div class="passage-title">{{ curPassage?.title }}</div> -->
+        <div class="passage-content" v-html="curPassage.trans"></div>
       </div>
     </div>
   </div>
@@ -102,9 +123,12 @@
   import { Community } from '@/api/community/index.d';
   import api from '@/api';
   import { useRouter } from 'vue-router';
+  import ExportSavePdf from '@/util/html2pdf';
+
   interface PassageContent {
     title: string;
     content: string;
+    trans: string;
   }
 
   const router = useRouter();
@@ -118,7 +142,8 @@
   let pageNum = ref(1);
   let showPassage = ref(false);
   let pageCount = ref(0);
-  let curPassage = ref<PassageContent>({ title: '', content: '' });
+  let curPassage = ref<PassageContent>({ title: '', content: '', trans: '' });
+  let showTrans = ref(false);
 
   onMounted(async () => {
     communityColumn.value = await api.community.getCommunityList();
@@ -160,17 +185,34 @@
   const goToPassage = (item: Community.PassageItem) => {
     //说明文章是文件形式不是字符串形式
     if (item.passageContent.startsWith('http')) {
-      router.push({ name: 'CommunityContent' });
+      // router.push({ name: 'CommunityContent' });
+      let oA = document.createElement('a');
+      oA.download = item.passageContent.replace('http://43.139.46.117:8083/', '');
+      oA.href = item.passageContent;
+      oA.click();
+      console.log('OA is', oA);
     } else {
       showPassage.value = true;
       curPassage.value.title = item.passageTitle;
       curPassage.value.content = item.passageContent;
+      curPassage.value.trans = item.translate;
     }
   };
 
   const pageChange = (page: number) => {
     pageNum.value = page;
     changeCurPassageList(page);
+  };
+
+  const showTransPassage = () => {
+    showTrans.value = !showTrans.value;
+  };
+
+  const downloadPdf = (name: string) => {
+    // const time = moment().format('YYYY年MM月D日');
+    window.$message.info('开始下载文档');
+    const d = new Date();
+    ExportSavePdf('pdfcontent', name.substring(0, 15), d.getMonth() + d.getDate());
   };
 </script>
 
@@ -179,8 +221,7 @@
     display: flex;
     justify-content: center;
     padding-top: 16px;
-    &-left,
-    &-right {
+    &-left {
       width: 400px;
     }
     &-left {
@@ -217,11 +258,11 @@
       }
     }
     &-right {
-      width: 550px;
+      display: flex;
       background: #fff;
       padding: 16px;
       max-height: 600px;
-      overflow-y: auto;
+      min-width: 500px;
       .column-intro {
         display: flex;
         &-left {
@@ -269,6 +310,15 @@
       justify-content: flex-end;
     }
     .passage {
+      width: 520px;
+      background: #fff;
+      max-height: 600px;
+      overflow-y: auto;
+      padding: 16px;
+      &-operation {
+        display: flex;
+        justify-content: flex-end;
+      }
       &-title {
         text-align: center;
         font-size: 16px;
@@ -278,6 +328,9 @@
       &-content {
         color: #8a8a8a;
       }
+    }
+    .passage:nth-child(2) {
+      padding-top: 46px;
     }
   }
 </style>

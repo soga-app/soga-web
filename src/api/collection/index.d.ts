@@ -18,5 +18,6 @@ export namespace Collection {
     colId: number;
     sentenceNum: number;
     wordId: number;
+    type: string;
   }
 }

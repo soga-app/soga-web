@@ -27,5 +27,6 @@ export namespace Community {
     catergory2: string;
     passageTitle: string;
     passageContent: string;
+    translate: string;
   }
 }
