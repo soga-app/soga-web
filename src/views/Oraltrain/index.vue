@@ -28,6 +28,12 @@
           :key="index"
           :class="`dialog-item ${item.role === 'user' ? 'item-user' : 'item-robot'}`"
         >
+          <svg-icon
+            name="icon-yuyin1"
+            :color="item.role === 'user' ? '#fc2f70' : '#3f33e7'"
+            font-size="22px"
+            @click="play(index, item.originContent)"
+          />
           <n-popover placement="top-start">
             <template #trigger>
               <div class="text">
@@ -60,17 +66,48 @@
         </div>
       </div>
       <div class="scene-input">
-        <n-input
-          v-model:value="user_text"
-          class="scene-input-self"
-          placeholder="请输入对话语句"
-          @keyup.enter="generateConversation"
-        >
-        </n-input>
-        <n-button type="primary" :disabled="!generateBtnShow" @click="generateConversation"
-          >生成回答</n-button
-        >
+        <span style="display: inline-block; margin-right: 16px">
+          <svg-icon
+            :name="isRecordShow ? 'icon-jianpan' : 'icon-yuyin'"
+            font-size="32px"
+            color="#131415"
+            @click="isRecordShow = !isRecordShow"
+          />
+        </span>
+        <template v-if="isRecordShow">
+          <div class="record-box">
+            <span style="display: inline-block; width: 600px"
+              ><n-button
+                style="width: 100%"
+                tertiary
+                type="info"
+                :disabled="!generateBtnShow"
+                @click="startRecord"
+              >
+                点击录音
+              </n-button></span
+            >
+          </div>
+        </template>
+        <template v-else>
+          <n-input
+            v-model:value="user_text"
+            class="scene-input-self"
+            placeholder="请输入对话语句"
+            @keyup.enter="generateConversation"
+          >
+          </n-input>
+          <n-button type="primary" :disabled="!generateBtnShow" @click="generateConversation"
+            >生成回答</n-button
+          >
+        </template>
       </div>
+      <n-modal v-model:show="isRecording">
+        <div class="record-modal">
+          <canvas id="canvas" style="width: 400px; height: 32px; margin-right: 16px"></canvas>
+          <n-button tertiary type="info" @click="stopRecord">结束录音</n-button></div
+        >
+      </n-modal>
     </div>
   </div>
 </template>
@@ -83,6 +120,7 @@
   import { ref, onMounted, computed, watch } from 'vue';
   import api from '@/api';
   import useClipboard from 'vue-clipboard3';
+  import Recorder from 'js-audio-recorder';
 
   interface ConversationItem {
     role: string;
@@ -92,6 +130,7 @@
     scene: string;
     userRole: string;
     robotRole: string;
+    audio_user?: Recorder;
   }
   const conversation = ref<Array<ConversationItem>>([]);
 
@@ -129,6 +168,20 @@
     '親愛なるマスター、SOGA日本語の情景口語練習基地へようこそ、下の入力ボックスに文を入力してアンドロイドとの会話を始めてください！';
   let audioSrcMap = new Map();
   audioSrcMap.set(welcomeTextJP, 'http://43.139.46.117:8083/upload-XunFei/1679288914665.mp3');
+
+  let isRecordShow = ref(false);
+  let isRecording = ref(false);
+  let currenPlayTimer: any = null;
+  let voiceList = ref<Array<Recorder>>([]);
+  let recorder = new Recorder({
+    sampleBits: 16, // 采样位数，支持 8 或 16，默认是16
+    sampleRate: 16000, // 采样率，支持 11025、16000、22050、24000、44100、48000，根据浏览器默认值，我的chrome是48000
+    numChannels: 1
+  });
+
+  let ctx: any = null;
+  let drawRecordId: any = null;
+  let oCanvas: any = null;
 
   onMounted(() => {
     init();
@@ -175,7 +228,19 @@
     user_role.value = '';
     robot_role.value = '';
   };
-
+  const getRes = async () => {
+    const res = await api.oraltrain.getChatgptResponse({
+      scene: scene.value,
+      user_role: user_role.value,
+      robot_role: robot_role.value,
+      user_text: user_text.value
+    });
+    let cleanText = res.replace(/\r|\n/gi, '');
+    conversation.value[conversation.value.length - 1].originContent = cleanText;
+    generateBtnShow.value = true;
+    user_text.value = '';
+    audioPlay(cleanText);
+  };
   const generateConversation = async () => {
     if (!isSceneSet.value) {
       window.$message.warning('请先选好对话场景哦！');
@@ -200,23 +265,20 @@
         audio: '',
         transContent: ''
       });
-      const res = await api.oraltrain.getChatgptResponse({
-        scene: scene.value,
-        user_role: user_role.value,
-        robot_role: robot_role.value,
-        user_text: user_text.value
-      });
-      let cleanText = res.replace(/\r|\n/gi, '');
-      conversation.value[conversation.value.length - 1].originContent = cleanText;
-      generateBtnShow.value = true;
-      user_text.value = '';
-      audioPlay(cleanText);
+      //   const res = await api.oraltrain.getChatgptResponse({
+      //     scene: scene.value,
+      //     user_role: user_role.value,
+      //     robot_role: robot_role.value,
+      //     user_text: user_text.value
+      //   });
+      //   let cleanText = res.replace(/\r|\n/gi, '');
+      //   conversation.value[conversation.value.length - 1].originContent = cleanText;
+      //   generateBtnShow.value = true;
+      //   user_text.value = '';
+      //   audioPlay(cleanText);
+      // }
+      getRes();
     }
-  };
-
-  const play = () => {
-    let audioPlayer = document.getElementById('textAudioPlayer') as HTMLAudioElement;
-    audioPlayer.play();
   };
 
   const audioPlay = async (cleanText: string) => {
@@ -258,6 +320,140 @@
       console.error(e);
     }
     return { copy };
+  };
+
+  const startRecord = () => {
+    if (!isSceneSet.value) {
+      window.$message.warning('请先选好对话场景哦！');
+      return;
+    }
+    isRecording.value = true;
+    recorder = new Recorder({
+      sampleBits: 16, // 采样位数，支持 8 或 16，默认是16
+      sampleRate: 16000, // 采样率，支持 11025、16000、22050、24000、44100、48000，根据浏览器默认值，我的chrome是48000
+      numChannels: 1
+    }); //使用默认配置，mp3格式
+
+    recorder.start().then(
+      () => {
+        // 开始录音
+        console.log('开始录音了=========');
+        oCanvas = document.getElementById('canvas');
+        ctx = oCanvas.getContext('2d');
+        console.log('oCanvas', oCanvas);
+        drawRecord();
+      },
+      (error: any) => {
+        // 出错了
+        console.log(error);
+      }
+    );
+  };
+
+  const stopRecord = () => {
+    isRecording.value = false;
+    console.log('停止录音=========');
+    recorder.stop();
+    drawRecordId && cancelAnimationFrame(drawRecordId);
+    drawRecordId = null;
+    if (recorder.duration < 1) {
+      window.$message.info('时常过短，请重新录制');
+      recorder.destroy();
+      return;
+    }
+    // recorder.percentage = 0
+    voiceList.value.push(recorder);
+    audio2Text(recorder);
+    recorder = new Recorder();
+  };
+
+  const audio2Text = async (recorder: Recorder) => {
+    conversation.value.push({
+      role: 'user',
+      originContent: '',
+      scene: scene.value,
+      userRole: user_role.value,
+      robotRole: robot_role.value,
+      audio: '',
+      transContent: ''
+    });
+    var form = new FormData();
+    const blob = recorder.getWAVBlob();
+    form.append('file', blob, 'recorder.wav');
+    let { text } = await api.oraltrain.audio2Text(form);
+    let newText = '';
+    let len = conversation.value.length;
+    if (text.includes('。')) {
+      newText = text.substring(0, text.length - 1) + '?';
+    } else {
+      text += '?';
+    }
+    conversation.value[len - 1].originContent = newText;
+    user_text.value = newText;
+    console.log('语音转文字的结果是', newText);
+    conversation.value.push({
+      role: 'robot',
+      originContent: '',
+      scene: scene.value,
+      userRole: user_role.value,
+      robotRole: robot_role.value,
+      audio: '',
+      transContent: ''
+    });
+    getRes();
+  };
+
+  const drawRecord = () => {
+    // 用requestAnimationFrame稳定60fps绘制
+    drawRecordId = requestAnimationFrame(drawRecord);
+
+    // 实时获取音频大小数据
+    const dataArray = recorder.getRecordAnalyseData();
+    const bufferLength = dataArray.length;
+
+    // 填充背景色
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(0, 0, oCanvas.width, oCanvas.height);
+
+    // 设定波形绘制颜色
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = '#587acb';
+
+    ctx.beginPath();
+
+    var sliceWidth = (oCanvas.width * 1.0) / bufferLength; // 一个点占多少位置，共有bufferLength个点要绘制
+    var x = 0; // 绘制点的x轴位置
+
+    for (var i = 0; i < bufferLength; i++) {
+      var v = dataArray[i] / 128.0;
+      var y = (v * oCanvas.height) / 2;
+
+      if (i === 0) {
+        // 第一个点
+        ctx.moveTo(x, y);
+      } else {
+        // 剩余的点
+        ctx.lineTo(x, y);
+      }
+      // 依次平移，绘制所有点
+      x += sliceWidth;
+    }
+
+    ctx.lineTo(oCanvas.width, oCanvas.height / 2);
+    ctx.stroke();
+  };
+
+  const play = (index: number, text: string) => {
+    if (index % 2 === 0) {
+      audioPlay(text);
+      return;
+    } else {
+      let num = (index + 1) / 2 - 1;
+      for (const item of voiceList.value) {
+        item.stopPlay();
+      }
+      voiceList.value[num].play();
+    }
   };
 </script>
 
@@ -353,11 +549,22 @@
       .scene-input {
         display: flex;
         position: absolute;
+        align-items: center;
         bottom: 16px;
-        width: 668px;
+        width: 640px;
         margin-left: 12px;
         justify-content: center;
+        .record-box {
+          display: flex;
+          align-items: center;
+        }
       }
     }
+  }
+  .record-modal {
+    background: #fff;
+    padding: 24px;
+    display: flex;
+    align-items: center;
   }
 </style>

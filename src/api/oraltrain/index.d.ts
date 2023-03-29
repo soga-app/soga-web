@@ -5,4 +5,7 @@ export namespace Oral {
     robot_role: string;
     user_role: string;
   }
+  interface Audio2TextRes {
+    text: string;
+  }
 }
