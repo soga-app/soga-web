@@ -1,10 +1,11 @@
 import axios, { AxiosRequestConfig, AxiosResponse, AxiosInstance } from 'axios';
 import qs from 'qs';
-axios.defaults.timeout = 600000;
+import { cloneDeep } from 'lodash';
+// axios.defaults.timeout = 60000;
 
 const config = {
   // 设置超时时间（60s）
-  timeout: 60000,
+  timeout: 6000,
   // 跨域时候允许携带凭证
   withCredentials: true
 };
@@ -19,10 +20,12 @@ class RequestHttp {
         if (userState) {
           config.headers.authorization = JSON.parse(userState).token;
         }
-        // 序列化get请求
+        // 序列化get请求, 解决get请求需要传数组的情况;
         if (config.method === 'get') {
-          config.paramsSerializer = (params: any) => {
-            return qs.stringify(params, { arrayFormat: 'repeat' });
+          config.paramsSerializer = {
+            serialize: function (params: any) {
+              return qs.stringify(params, { arrayFormat: 'repeat' });
+            }
           };
         }
         return config;
@@ -46,26 +49,47 @@ class RequestHttp {
         }
       },
       (error: any) => {
-        //todo 请求重试
-        const responseCode = error.response.status;
-        const data = error.response.data;
-        if (responseCode >= 500) {
-          window.$message.error(data.msg);
+        const { config } = error;
+        // 请求重试 done,retryTimes 要在使用重传的接口中配置
+        if (config && config.retryTimes) {
+          const { __retryCount = 0, retryDelay = 300, retryTimes } = config;
+          config.__retryCount = __retryCount;
+          console.log(`重试the ${__retryCount} times`);
+          if (__retryCount < retryTimes) {
+            config.__retryCount++;
+            const delay = new Promise((resolve) => {
+              setTimeout(() => {
+                resolve(true);
+              }, retryDelay);
+            });
+            //重新发起请求
+            return delay.then(() => {
+              console.log('重新发起请求');
+              return this.service.request(config);
+            });
+          }
         }
         // 断网或者请求超时状态
         if (!error.response) {
           // 请求超时状态
           if (error.config.hideErrorMsg) {
             // 隐藏提示
-          } else if (error.message.includes('timeout')) {
-            window.$message.error('请求超时，请检查网络是否连接正常');
+          } else if (error.message.includes('Network Error')) {
+            window.$message.error('请求失败，请检查网络是否连接正常');
           } else if (error.message.includes('cancel')) {
             // 主动取消，不抛异常
+          } else if (error.message.includes('timeout')) {
+            window.$message.error('请求超时');
           } else {
-            window.$message.error('请求失败，请检查网络是否已连接');
           }
           return Promise.reject(error);
         }
+        const responseCode = error.response.status;
+        const data = error.response.data;
+        if (responseCode >= 500) {
+          window.$message.error(`${data.msg ? data.msg : '服务端出错'}`);
+        }
+
         // todo token更新
         switch (responseCode) {
           //请求错误

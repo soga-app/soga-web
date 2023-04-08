@@ -57,6 +57,14 @@
       <component :is="Component" v-if="!$route.meta.keepAlive" />
     </router-view>
   </div>
+  <div class="test">
+    <n-space :size="10"
+      ><n-button type="primary" @click="testTimeout">测试超时</n-button>
+      <n-button type="primary" @click="testTimeoutRetry">测试超时会重传</n-button>
+      <n-button type="primary" @click="testWrongCode">测试错误状态码</n-button>
+      <n-button type="primary" @click="testWrongCodeGet">测试错误状态码-get方法</n-button>
+    </n-space>
+  </div>
 </template>
 <script lang="ts" setup>
   import api from '@/api';
@@ -65,6 +73,7 @@
   import { UserStore } from '@/stores';
   import { useRoute, useRouter } from 'vue-router';
   import { computed, ref, onMounted, watch } from 'vue';
+  import http from '@/api/config';
 
   const route = useRoute();
   const router = useRouter();
@@ -155,6 +164,43 @@
       return { label: item.type, value: { wordId, colId }, info: { ...item } };
     });
     curChildOption.value = childFirstOption;
+  };
+
+  const testTimeout = async () => {
+    const res = await http.get('http://127.0.0.1:4523/m1/2125089-0-default/error/timeout');
+    console.log('执行testTimeout res is', res);
+  };
+  const testTimeoutRetry = async () => {
+    const res = await http.get(
+      'http://127.0.0.1:4523/m1/2125089-0-default/error/timeout',
+      {},
+      {
+        retryTimes: 3
+      }
+    );
+    console.log('执行testTimeout res is', res);
+  };
+  const testWrongCode = () => {
+    try {
+      http.post(
+        'http://127.0.0.1:4523/m1/2125089-0-default/error/wrongCode',
+        { id: 1 },
+        { retryTimes: 3 }
+      );
+    } catch (error: any) {
+      console.log(error);
+    }
+  };
+  const testWrongCodeGet = () => {
+    try {
+      http.get(
+        'http://127.0.0.1:4523/m1/2125089-0-default/error/wrongcode-get',
+        { id: 1, info: [1, 2, 3] },
+        { retryTimes: 3 }
+      );
+    } catch (error: any) {
+      console.log(error);
+    }
   };
 </script>
 <style scoped lang="less">

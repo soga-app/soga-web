@@ -25,10 +25,10 @@ export default function (elementName: string, htmlTitle: string, currentTime: an
       page.height = Math.min(imgHeight, canvas.height - renderedHeight); // 可能内容不足一页
 
       // 用getImageData剪裁指定区域，并画到前面创建的canvas对象中
-      page
+      (page as any)
         .getContext('2d')
         .putImageData(
-          ctx.getImageData(
+          (ctx as any).getImageData(
             0,
             renderedHeight,
             canvas.width,

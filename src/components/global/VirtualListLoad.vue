@@ -173,6 +173,7 @@
   });
 
   onUpdated(() => {
+    console.log('onupdate');
     nextTick(() => {
       if (!items.value) {
         return;
