@@ -6,7 +6,7 @@
   <div class="book-mark-dropdown" @mouseenter="handleMouseEnter" @mouseleave="handleMouseLeave">
     <slot name="trigger" class="trigger"></slot>
     <div id="display-content">
-      <div v-if="options" class="display-content-wrap">
+      <div class="display-content-wrap">
         <div class="display-content-left">
           <div
             v-for="(item, index) in options"
@@ -29,30 +29,29 @@
           </div>
         </div>
       </div>
-      <template v-else>
-        <list-loading />
-      </template>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-  import { ref, onMounted } from 'vue';
+  import { ref } from 'vue';
+
   interface BookMarkProps {
     options: Array<OptionItem>;
     curChildOption: Array<ChildOptionItem>;
   }
   const props = defineProps<BookMarkProps>();
-  const emits = defineEmits(['updateChildOption']);
+  const emits = defineEmits(['updateChildOption', 'visibleChange']);
   let curParentChoice = ref(0);
 
   const handleMouseEnter = () => {
-    if (props.options && props.options.length)
-      (document.getElementById('display-content') as HTMLElement).style.display = 'block';
+    (document.getElementById('display-content') as HTMLElement).style.display = 'block';
+    emits('visibleChange', true);
   };
 
   const handleMouseLeave = () => {
     (document.getElementById('display-content') as HTMLElement).style.display = 'none';
+    emits('visibleChange', false);
   };
 
   const updateChildOption = (value: any, index: number) => {
@@ -79,7 +78,7 @@
     }
     .display-content-wrap {
       overflow: hidden;
-      max-height: 400px;
+      max-height: 410px;
     }
     .display-content-left {
       margin-right: 8px;
@@ -99,7 +98,9 @@
       }
     }
     .display-content-right {
-      max-height: 500px;
+      width: 320px;
+      max-width: 320px;
+      max-height: 400px;
       float: left;
       overflow-y: auto;
       padding-left: 10px;

@@ -12,6 +12,7 @@ export namespace Dic {
     jyc?: Array<string>;
     xjc?: Array<string>;
     isCollected?: Array<number>;
+    information?: string;
   }
   interface Sentence {
     Chinese: string;
@@ -86,5 +87,13 @@ export namespace Dic {
     learnedNum: number;
     reviewedNum: number;
     learnTime: number;
+  }
+  interface WordBookInfoItem {
+    id: number;
+    wordId: number;
+    userId: number;
+    dictId: number;
+    word: string;
+    meaning: string;
   }
 }

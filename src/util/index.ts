@@ -22,3 +22,24 @@ export const toDecimal = (x: number): number => {
   f = Math.round(x * 100) / 100;
   return f;
 };
+
+// 判断单词是中文还是日文，是中文返回1，日文返回2，啥都不是返回-1
+export const isChinese = (word: string) => {
+  // 判断是否包含汉字的正则表达式
+  const chineseReg = new RegExp('[\u4e00-\u9fa5]');
+  // 判断是否包含日文字符的正则表达式
+  const japaneseReg = new RegExp(
+    '[\u0800-\u4e00\u007c\u2026-\u2026\u3002-\u3003\u3005\u3006-\u3007\u303b-\u303c]'
+  );
+  //  将单词赋值给 word
+  if (chineseReg.test(word)) {
+    console.log('该单词为中文');
+    return 1;
+  } else if (japaneseReg.test(word)) {
+    console.log('该单词为日文');
+    return 2;
+  } else {
+    console.log('该单词不是中文也不是日文');
+    return -1;
+  }
+};

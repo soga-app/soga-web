@@ -91,19 +91,31 @@
       </div>
       <div v-else class="passage">
         <div class="passage-operation">
-          <svg-icon
-            style="margin-right: 16px"
-            name="icon-shuyi_fanyi-105"
-            font-size="20px"
-            hover-color="#587acb"
-            @click="showTransPassage"
-          />
-          <svg-icon
-            name="icon-xiazai"
-            font-size="20px"
-            hover-color="#587acb"
-            @click="downloadPdf(curPassage.title)"
-          />
+          <n-tooltip trigger="hover">
+            <template #trigger>
+              <span>
+                <svg-icon
+                  style="margin-right: 16px"
+                  name="icon-shuyi_fanyi-105"
+                  font-size="20px"
+                  hover-color="#587acb"
+                  @click="showTransPassage"
+              /></span>
+            </template>
+            日语译文
+          </n-tooltip>
+          <n-tooltip trigger="hover">
+            <template #trigger>
+              <span>
+                <svg-icon
+                  name="icon-xiazai"
+                  font-size="20px"
+                  hover-color="#587acb"
+                  @click="downloadPdf(curPassage.title)"
+              /></span>
+            </template>
+            下载文章pdf
+          </n-tooltip>
         </div>
         <div id="pdfcontent">
           <div class="passage-title">{{ curPassage?.title }}</div>

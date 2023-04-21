@@ -38,7 +38,7 @@
   let curColor = ref<string>('');
   let name = toRef(props, 'name');
   let color = toRef(props, 'color');
-  curColor = color;
+  curColor.value = color.value;
 
   // if (props.hoverColor) {
   //   console.log('yes', props.hoverColor);

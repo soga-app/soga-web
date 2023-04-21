@@ -29,8 +29,21 @@
       <div class="word-info" :style="{ marginTop: curWord ? '140px' : '50px' }">
         <div v-if="curWord" class="word-info-inner">
           <div class="word">
-            {{ curWord?.word }} <span>[{{ curWord?.pianJm }}]</span></div
-          >
+            <span> {{ curWord?.word }}</span> <span>[{{ curWord?.pianJm }}]</span>
+            <span style="margin-left: 16px">
+              <n-tooltip trigger="hover">
+                <template #trigger>
+                  <span>
+                    <svg-icon
+                      name="icon-tianjiaadd143"
+                      hover-color="#587acb"
+                      @click="addToWordBook(curWord?.word)"
+                  /></span>
+                </template>
+                加入生词本
+              </n-tooltip>
+            </span>
+          </div>
           <div class="word-luomayin">{{ curWord?.luomayin }}</div>
           <div class="wordInfo-audio">
             <div class="wordInfo-audio-female">
@@ -225,7 +238,6 @@
         break;
     }
     audio.play();
-    console.log('调用了playAudio');
   }
 
   const checkWordCard = () => {
@@ -296,6 +308,28 @@
     });
 
     processStart.value++;
+  };
+
+  const addToWordBook = (word?: string) => {
+    window.$dialog.info({
+      title: '提示',
+      content: `确认将 ${word} 加入生词本？`,
+      positiveText: '确认',
+      negativeText: '取消',
+      onPositiveClick: async () => {
+        let curIndex = processStart.value;
+        let dictIndex =
+          curIndex < reviewWord.value
+            ? reviewList[curIndex].dictIndex
+            : learnList[curIndex - reviewWord.value].dictIndex;
+        const res = await api.dictionary.addToWordBook({ dictIndex, dictId: Number(dictId.value) });
+        if (!res) {
+          window.$message.success('添加成功');
+        } else {
+          window.$message.error('添加失败');
+        }
+      }
+    });
   };
 </script>
 

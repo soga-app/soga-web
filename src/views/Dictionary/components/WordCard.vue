@@ -92,24 +92,34 @@
                 </div>
                 <div class="sent-info-right">
                   <div class="sent-info-icon">
-                    <svg-icon
-                      color="#7f98d6"
-                      font-size="16px"
-                      name="icon-copy"
-                      class="icon-copy"
-                      @click="copy(`${slotProps.item.Japanese}\n${slotProps.item.Chinese}`)"
-                    />
-                    <svg-icon
-                      color="#7f98d6"
-                      font-size="16px"
-                      :name="
-                        wordInfo.isCollected?.includes(slotProps.item.num)
-                          ? 'icon-favorites-fill'
-                          : 'icon-favorite'
-                      "
-                      class="icon-favorite"
-                      @click="collectSentence(slotProps.item.num)"
-                    />
+                    <n-tooltip trigger="hover">
+                      <template #trigger>
+                        <svg-icon
+                          color="#7f98d6"
+                          font-size="16px"
+                          name="icon-copy"
+                          class="icon-copy"
+                          @click="copy(`${slotProps.item.Japanese}\n${slotProps.item.Chinese}`)"
+                        />
+                      </template>
+                      复制
+                    </n-tooltip>
+                    <n-tooltip trigger="hover">
+                      <template #trigger>
+                        <svg-icon
+                          color="#7f98d6"
+                          font-size="16px"
+                          :name="
+                            wordInfo.isCollected?.includes(slotProps.item.num)
+                              ? 'icon-favorites-fill'
+                              : 'icon-favorite'
+                          "
+                          class="icon-favorite"
+                          @click="collectSentence(slotProps.item.num)"
+                        />
+                      </template>
+                      收藏
+                    </n-tooltip>
                   </div>
                 </div>
               </div>

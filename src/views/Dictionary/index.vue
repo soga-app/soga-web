@@ -65,16 +65,20 @@
   let searchOptionShow = ref(false);
   let curWord = ref('');
 
-  const getWordInfo = async (word: string) => {
-    wordInfo.value = await api.dictionary.getWordCard(word);
+  const getWordInfo = async (word?: string, wordId?: number) => {
+    const res = await api.dictionary.getWordCard({ word, wordId });
+    wordInfo.value = res[0];
   };
 
   watch(
-    () => route.params,
+    () => route.query,
     (newVal: any, oldVal: any) => {
       if (newVal?.word) {
         curWord.value = newVal.word;
         getWordInfo(newVal.word);
+      }
+      if (newVal?.wordId) {
+        getWordInfo(undefined, newVal.wordId);
       }
     },
     { immediate: true }
@@ -99,7 +103,7 @@
   function handelOptionChecked(checkedOption: string) {
     searchOptionShow.value = false;
     searchWord.value = checkedOption;
-    router.push({ name: 'Dictionary', params: { word: checkedOption } });
+    router.push({ name: 'Dictionary', query: { word: checkedOption } });
   }
   function leave() {
     searchOptionShow.value = false;
@@ -110,7 +114,7 @@
   }
   async function handelSearchWord(word: string) {
     wordInfo.value = [];
-    router.push({ name: 'Dictionary', params: { word } });
+    router.push({ name: 'Dictionary', query: { word } });
   }
   const refresh = () => {
     getWordInfo(curWord.value);

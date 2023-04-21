@@ -143,8 +143,8 @@
     goTo(pathName);
   }
 
-  function goTo(path: string, params?: any) {
-    router.push({ name: path, params });
+  function goTo(path: string, query?: any) {
+    router.push({ name: path, query });
   }
 
   function playAudio(type: 'female' | 'male') {

@@ -1,6 +1,6 @@
 export default [
   {
-    path: 'index/:word',
+    path: 'index',
     name: 'Dictionary',
     component: () => import('@/views/Dictionary/index.vue')
   },

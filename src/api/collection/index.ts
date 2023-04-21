@@ -12,9 +12,12 @@ export default {
   getCollectionList: (): Promise<Array<Collection.CollectionItem>> =>
     http.get('/api/collections/list'),
   // 修改收藏夹名称
-  updateCollectionName: (data: { name: string; id: number }): Promise<void> =>
-    http.post('/api/collections/update', data),
+  updateCollectionName: (params: { name: string; id: number }): Promise<void> =>
+    http.post('/api/collections/update', null, { params }),
   //收藏内容
   collectContent: (data: Collection.CollectContentParam): Promise<void> =>
-    http.post('/api/colSentence/add', data)
+    http.post('/api/colSentence/add', data),
+  //删除收藏夹
+  deleteCollection: (params: { id: number }): Promise<void> =>
+    http.del('/api/collections/delete', null, { params })
 };

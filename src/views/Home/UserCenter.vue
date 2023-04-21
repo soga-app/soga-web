@@ -20,61 +20,72 @@
           <div class="user-info-up-right">退出登录 </div>
         </div>
         <div class="user-info-down">
-          <div class="user-info-down-left">
+          <div class="user-info-down-item">
             <router-link to="/updateInformation"> 修改个人资料 </router-link>
           </div>
-          <div class="user-info-down-mid">|</div>
-          <div class="user-info-down-right">学习数据</div>
+          <div class="user-info-down-item" @click="handleShowWordBook">生词本</div>
+          <div class="user-info-down-item" @click="handleShowCollection">收藏夹</div>
+          <div class="user-info-down-item">学习数据</div>
         </div>
       </div>
-      <div class="plan-card">
-        <div class="plan-card-bg"> </div>
-        <div class="plan-card-wrapper">
-          <div class="plan-card-up">
-            <div class="plan-card-up-left">
-              <div class="dic-name">{{ bookName }} </div>
-              <div class="plan-setting">
-                <svg-icon name="icon-shezhi" font-size="14px" color="#587acb" />
-                学习设置</div
-              >
+      <div v-if="!showWordBook && !showCollection" class="user-info-other">
+        <div class="plan-card">
+          <div class="plan-card-bg"> </div>
+          <div class="plan-card-wrapper">
+            <div class="plan-card-up">
+              <div class="plan-card-up-left">
+                <div class="dic-name">{{ bookName }} </div>
+                <div class="plan-setting">
+                  <svg-icon name="icon-shezhi" font-size="14px" color="#587acb" />
+                  学习设置</div
+                >
+              </div>
+              <div class="plan-card-up-right"> 查看词表</div>
             </div>
-            <div class="plan-card-up-right"> 查看词表</div>
+            <div class="plan-card-mid">
+              <div class="plan-process">
+                <div class="plan-process-percent">已完成{{ process }}%</div>
+                <div class="plan-process-num">{{ learned }} /{{ total }} 词</div>
+              </div>
+              <n-progress type="line" :percentage="percentage" :show-indicator="false" />
+              <divc class="plan-process-tip">-已离线存储进度-</divc>
+            </div>
+            <div class="plan-card-down">
+              <div class="learn">
+                <div class="word-text">待学习</div>
+                <div class="word-num">{{ toCurLearn }}</div>
+              </div>
+              <div class="review">
+                <div class="word-text">待复习</div> <div class="word-num">{{ toReview }} </div>
+              </div>
+              <div class="todo">
+                <div class="word-text">未学</div> <div class="word-num">{{ toLearn }} </div>
+              </div>
+            </div>
           </div>
-          <div class="plan-card-mid">
-            <div class="plan-process">
-              <div class="plan-process-percent">已完成{{ process }}%</div>
-              <div class="plan-process-num">{{ learned }} /{{ total }} 词</div>
-            </div>
-            <n-progress type="line" :percentage="percentage" :show-indicator="false" />
-            <divc class="plan-process-tip">-已离线存储进度-</divc>
+        </div>
+        <div class="learning-button"
+          ><n-button type="tertiary" @click="router.push({ name: 'Reciteword' })">
+            开始学习
+          </n-button>
+        </div>
+        <div class="vip-service">
+          <div class="layer1"
+            ><div class="vip-service-left">VIP-SOGA日语学习APP</div>
+            <div class="vip-service-right">开通</div>
           </div>
-          <div class="plan-card-down">
-            <div class="learn">
-              <div class="word-text">待学习</div>
-              <div class="word-num">{{ toCurLearn }}</div>
-            </div>
-            <div class="review">
-              <div class="word-text">待复习</div> <div class="word-num">{{ toReview }} </div>
-            </div>
-            <div class="todo">
-              <div class="word-text">未学</div> <div class="word-num">{{ toLearn }} </div>
-            </div>
+          <div class="layer2">
+            <div class="advantage-text">高质量字典、vip背词词典</div>
+            <div class="advantage-text">翻译文档下载</div>
+            <div class="advantage-text">智能场景模拟</div>
           </div>
         </div>
       </div>
-      <div class="learning-button"><n-button type="tertiary"> 开始学习 </n-button> </div>
-      <div class="vip-service">
-        <div class="layer1"
-          ><div class="vip-service-left">VIP-SOGA日语学习APP</div>
-          <div class="vip-service-right">开通</div>
-        </div>
-        <div class="layer2">
-          <div class="advantage-text">高质量字典、vip背词词典</div>
-          <div class="advantage-text">翻译文档下载</div>
-          <div class="advantage-text">智能场景模拟</div>
-        </div>
-      </div></div
-    >
+      <div class="user-info-content">
+        <collection v-if="showCollection" />
+        <word-book v-if="showWordBook" />
+      </div>
+    </div>
   </div>
 </template>
 <script lang="ts" setup>
@@ -83,10 +94,13 @@
   import girlImg from '@/assets/img/user/girl.png';
   import boyImg from '@/assets/img/user/boy.png';
   import api from '@/api';
-  import { provideCarouselContext } from 'naive-ui/es/carousel/src/CarouselContext';
+  import { useRouter } from 'vue-router';
   import { toDecimal } from '@/util';
+  import Collection from './components/Collection.vue';
+  import WordBook from './components/WordBook.vue';
 
   const userStore = UserStore();
+  const router = useRouter();
   let bookName = ref('');
   let process = ref(0);
   let toCurLearn = ref(0);
@@ -95,6 +109,9 @@
   let learned = ref(0);
   let total = ref(0);
   let percentage = ref(0);
+  let showWordBook = ref(false);
+  let showCollection = ref(false);
+
   onMounted(async () => {
     const res = await api.dictionary.getTodayWordGoal();
     bookName.value = res.plan.name;
@@ -106,6 +123,15 @@
     total.value = res.plan.count;
     if (process.value !== 0) percentage.value = process.value < 1 ? 1 : process.value;
   });
+
+  const handleShowWordBook = () => {
+    showWordBook.value = true;
+    showCollection.value = false;
+  };
+  const handleShowCollection = () => {
+    showWordBook.value = false;
+    showCollection.value = true;
+  };
 </script>
 
 <style lang="less" scoped>
@@ -118,6 +144,9 @@
       background: #ffffff;
       box-shadow: 0px 4px 4px 0px rgba(138, 138, 138, 0.25);
       border-radius: 6px 6px 6px 6px;
+      &-content {
+        margin-top: 40px;
+      }
       &-up {
         display: flex;
         padding: 16px 16px 16px 34px;
@@ -157,17 +186,9 @@
         align-items: center;
         background: #cfd8ef;
         border-radius: 0 0 6px 6px;
-        &-left {
-          a {
-            color: #587acb;
-            text-decoration: none;
-          }
-        }
-        &-right {
+        &-item {
           cursor: pointer;
-        }
-        &-mid {
-          font-size: 20px;
+          color: #587acb;
         }
       }
     }

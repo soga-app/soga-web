@@ -31,13 +31,14 @@
           :options="bookMarkOptions"
           :cur-child-option="curChildOption"
           @updateChildOption="updateChildOption"
+          @visibleChange="handleVisibleChange"
         >
           <!-- @updateDropDown="updateDropDown" -->
           <template #trigger>
             <div class="nav-right-option">收藏夹</div>
           </template>
           <template #child="{ option }">
-            <div class="child-option">
+            <div class="child-option" @click="goToDetail(option.info)">
               <div class="child-option-left">{{ option.info.type }}</div>
               <div class="child-option-right">
                 <div class="child-option-right-up">{{ option.info.sentence }}</div>
@@ -57,27 +58,20 @@
       <component :is="Component" v-if="!$route.meta.keepAlive" />
     </router-view>
   </div>
-  <div class="test">
-    <n-space :size="10"
-      ><n-button type="primary" @click="testTimeout">测试超时</n-button>
-      <n-button type="primary" @click="testTimeoutRetry">测试超时会重传</n-button>
-      <n-button type="primary" @click="testWrongCode">测试错误状态码</n-button>
-      <n-button type="primary" @click="testWrongCodeGet">测试错误状态码-get方法</n-button>
-    </n-space>
-  </div>
 </template>
 <script lang="ts" setup>
   import api from '@/api';
   import girlImg from '@/assets/img/user/girl.png';
   import boyImg from '@/assets/img/user/boy.png';
-  import { UserStore } from '@/stores';
+  import { UserStore, CollectionStore } from '@/stores';
   import { useRoute, useRouter } from 'vue-router';
-  import { computed, ref, onMounted, watch } from 'vue';
-  import http from '@/api/config';
+  import { computed, ref, nextTick, watch } from 'vue';
+  import mybus from '@/util/mybus';
 
   const route = useRoute();
   const router = useRouter();
   const userStore = UserStore();
+  const collectionStore = CollectionStore();
 
   let hideNav = computed(() => {
     return route.meta.hideNav;
@@ -102,7 +96,6 @@
   watch(
     () => route.name,
     (newVal, oldVal) => {
-      console.log(oldVal, newVal);
       if (oldVal === 'Login' && newVal === 'HomePage') {
         initCollection();
       }
@@ -155,6 +148,9 @@
         });
       }
     });
+    //本地存储收藏夹的信息，防止强制刷新时数据丢失
+    collectionStore.updateOptions(bookMarkOptions.value);
+    collectionStore.updateChildOption(curChildOption.value);
   };
 
   const updateChildOption = async (colId: number) => {
@@ -165,43 +161,23 @@
     });
     curChildOption.value = childFirstOption;
   };
+  const handleVisibleChange = (visible: boolean) => {
+    if (visible) {
+      //这里碰见了数据更新，页面却未更新的问题
+      bookMarkOptions.value = collectionStore.getOptions;
+      curChildOption.value = collectionStore.getCurChildOption;
+    }
+  };
 
-  const testTimeout = async () => {
-    const res = await http.get('http://127.0.0.1:4523/m1/2125089-0-default/error/timeout');
-    console.log('执行testTimeout res is', res);
-  };
-  const testTimeoutRetry = async () => {
-    const res = await http.get(
-      'http://127.0.0.1:4523/m1/2125089-0-default/error/timeout',
-      {},
-      {
-        retryTimes: 3
-      }
-    );
-    console.log('执行testTimeout res is', res);
-  };
-  const testWrongCode = () => {
-    try {
-      http.post(
-        'http://127.0.0.1:4523/m1/2125089-0-default/error/wrongCode',
-        { id: 1 },
-        { retryTimes: 3 }
-      );
-    } catch (error: any) {
-      console.log(error);
+  const goToDetail = (info: any) => {
+    console.log('info is', info);
+    const type = info.type;
+    if (type === '单词' || type === '句子') {
+      let wordId = info.wordId;
+      router.push({ name: 'Dictionary', query: { wordId } });
     }
   };
-  const testWrongCodeGet = () => {
-    try {
-      http.get(
-        'http://127.0.0.1:4523/m1/2125089-0-default/error/wrongcode-get',
-        { id: 1, info: [1, 2, 3] },
-        { retryTimes: 3 }
-      );
-    } catch (error: any) {
-      console.log(error);
-    }
-  };
+  mybus.on('refreshCol', initCollection);
 </script>
 <style scoped lang="less">
   .nav_wrapper {
@@ -239,7 +215,7 @@
   }
   .child-option {
     display: flex;
-    width: 304px;
+    width: 300px;
     height: 50px;
     align-items: center;
     &-left {

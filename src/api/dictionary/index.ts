@@ -3,7 +3,8 @@ import { Dic } from './index.d';
 
 export default {
   // 根据单词获取单词信息
-  getWordCard: (word: string): Promise<Dic.WordInfo> => http.get('/api/word/wordCard', { word }),
+  getWordCard: (params: { word?: string; wordId?: number }): Promise<Array<Dic.WordInfo>> =>
+    http.get('/api/word/wordCard', params),
   // 每日一词
   getDailyWord: (): Promise<Dic.WordInfo> => http.get('/api/word/daily'),
   // 根据输入匹配单词（词汇联想）
@@ -29,5 +30,10 @@ export default {
   getPlanRecordByCalendar: (params: {
     year: number;
     month: number;
-  }): Promise<Array<Dic.PlanRecordCalendarItem>> => http.get('/api/PlanRecord/Calendar', params)
+  }): Promise<Array<Dic.PlanRecordCalendarItem>> => http.get('/api/PlanRecord/Calendar', params),
+  //将单词加入生词本
+  addToWordBook: (params: { dictId: number; dictIndex: number }): Promise<any> =>
+    http.post('/api/userWord/insert', null, { params }),
+  //获取生词列表
+  getWordBookList: (): Promise<Array<Dic.WordBookInfoItem>> => http.get('/api/userWord/getList')
 };
